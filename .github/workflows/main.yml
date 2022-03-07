@@ -30,4 +30,4 @@ jobs:
         with:
           # Artifact name
           name: Hurtz
-          path: ./dist
+          path: ./dist/*
