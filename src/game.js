@@ -30,7 +30,12 @@ export default class Game {
   reset() {
     this.ctx.reset();
     Entity.entities.clear();
-    this.player = new Entity(0, 0, this.ctx.createSprite(Resources.wizard));
+    this.player = new Entity(
+      0,
+      0,
+      this.ctx.createSprite(Resources.wizard),
+      this.updateUI.bind(this)
+    );
   }
 
   processKey(e) {
@@ -90,7 +95,50 @@ export default class Game {
   moveEntities() {
     for (let [position, entity] of Entity.entities) {
       entity.move();
+      if (entity.position.x < 0)
+        entity.position = { x: 0, y: entity.position.y };
+      if (entity.position.y < 0)
+        entity.position = { x: entity.position.x, y: 0 };
+      if (entity.position.y >= this.mapHeight)
+        entity.position = { x: entity.position.x, y: this.mapHeight - 1 };
+      if (entity.position.x >= this.mapWidth)
+        entity.position = { x: this.mapWidth - 1, y: entity.position.y };
     }
+  }
+
+  updateUI() {
+    let output = "";
+    if (this.player.target.x > 0) {
+      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-right" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <polyline points="7 7 12 12 7 17" />
+  <polyline points="13 7 18 12 13 17" />
+</svg> ${this.player.target.x}`;
+    } else if (this.player.target.x < 0) {
+      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-left" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <polyline points="11 7 6 12 11 17" />
+  <polyline points="17 7 12 12 17 17" />
+</svg> ${Math.abs(this.player.target.x)}`;
+    }
+
+    output += "\n";
+
+    if (this.player.target.y > 0) {
+      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-down" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <polyline points="7 7 12 12 17 7" />
+  <polyline points="7 13 12 18 17 13" />
+</svg> ${this.player.target.y}`;
+    } else if (this.player.target.y < 0) {
+      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-up" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <polyline points="7 11 12 6 17 11" />
+  <polyline points="7 17 12 12 17 17" />
+</svg> ${Math.abs(this.player.target.y)}`;
+    }
+
+    this.ctx.write(output);
   }
 
   setMode(mode) {
@@ -148,22 +196,26 @@ export default class Game {
     switch (direction) {
       case Direction.Left:
         {
-          if (entity.position.x > 0) entity.target.x--;
+          if (entity.position.x > 0)
+            entity.target = { x: entity.target.x - 1, y: entity.target.y };
         }
         break;
       case Direction.Down:
         {
-          if (entity.position.y < this.mapHeight - 1) entity.target.y++;
+          if (entity.position.y < this.mapHeight - 1)
+            entity.target = { x: entity.target.x, y: entity.target.y + 1 };
         }
         break;
       case Direction.Up:
         {
-          if (entity.position.y > 0) entity.target.y--;
+          if (entity.position.y > 0)
+            entity.target = { x: entity.target.x, y: entity.target.y - 1 };
         }
         break;
       case Direction.Right:
         {
-          if (entity.position.x < this.mapWidth - 1) entity.target.x++;
+          if (entity.position.x < this.mapWidth - 1)
+            entity.target = { x: entity.target.x + 1, y: entity.target.y };
         }
         break;
     }
