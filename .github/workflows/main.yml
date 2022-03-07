@@ -27,6 +27,7 @@ jobs:
         
       - name: Download a Build Artifact
         uses: actions/download-artifact@v3.0.0
+        run: ls -R
         with:
           # Artifact name
           name: dist
