@@ -1,5 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 * {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Press Start 2P", cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
@@ -15,7 +17,10 @@ body {
   justify-content: center;
 }
 
-canvas {
+.output {
   padding: 1rem;
+  margin: 1rem;
   border: black solid 0.5rem;
+  min-width: 30vw;
+  min-height: 2rem;
 }

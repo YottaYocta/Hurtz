@@ -1,4 +1,6 @@
 import Context, { Resources } from "./context";
+import Audio from "./audio";
+import Sequence from './sequence';
 import Entity from "./entity";
 import { Direction } from "./utils";
 
@@ -6,25 +8,23 @@ export default class Game {
   constructor() {
     this.mapWidth = 16;
     this.mapHeight = 8;
-    this.mode = GameMode.Start;
 
-    this.startNotification = document.createElement('div');
-    this.startNotification.innerHTML = `
-        <h1>PRESS ANY KEY TO BEGIN</h1>
-    `;
+    // graphics
 
-    this.resetNotification = document.createElement('div');
-    this.resetNotification.innerHTML = `
-      <h1>YOU DIED. PRESS ANY KEY TO PLAY AGAIN</h1>
-    `;
+    this.ctx = new Context(this.mapWidth, this.mapHeight);
 
-    document.body.appendChild(this.startNotification);
+    // audio
+
+    this.audio = new Audio(Math.floor(Math.random() * 100) + 200);
+    this.sequence = new Sequence();
+    this.sequence.createMeasure();
 
     window.addEventListener("resize", () => {
       this.ctx.updateDimensions();
     });
     window.addEventListener("keydown", this.processKey.bind(this));
 
+    this.setMode(GameMode.Start);
   }
 
   reset() {
@@ -37,11 +37,9 @@ export default class Game {
     switch (this.mode) {
       case GameMode.Start:
         {
-          document.body.removeChild(this.startNotification);
-          this.mode = GameMode.Play;
-          this.ctx = new Context(this.mapWidth, this.mapHeight);
-          this.reset();
           window.requestAnimationFrame(this.tick.bind(this));
+          this.setMode(GameMode.Play);
+          this.reset();
         }
         break;
       case GameMode.Play:
@@ -68,22 +66,43 @@ export default class Game {
               }
               break;
             case "q":
-            {
-              this.mode = GameMode.Reset;
-              document.body.appendChild(this.resetNotification);
-            }; break;
+              {
+                this.setMode(GameMode.Reset);
+              }
+              break;
           }
         }
         break;
       case GameMode.Reset:
         {
-          document.body.removeChild(this.resetNotification);
           this.reset();
-          this.mode = GameMode.Play;
+          this.setMode(GameMode.Play);
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
     }
+  }
+
+  setMode(mode) {
+    switch (mode) {
+      case GameMode.Start:
+        {
+          this.ctx.write("PRESS ANY KEY TO BEGIN");
+          this.audio.stop();
+        }
+        break;
+      case GameMode.Play:
+        {
+          this.ctx.write("USE VIKEYS OR WASD TO MOVE");
+          this.audio.start(this.sequence);
+        }
+        break;
+      case GameMode.Reset: {
+        this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
+        this.audio.stop();
+      }
+    }
+    this.mode = mode;
   }
 
   tick() {

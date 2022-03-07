@@ -9,9 +9,16 @@ export default class Context {
     this.app = new PIXI.Application({ backgroundColor: 0xffffff });
     this.app.autoDensity = true;
     document.body.appendChild(this.app.view);
+    this.app.view.classList.add("output");
 
-    this.reset();
-    
+    // output console
+
+    this.outputContainer = document.createElement("div");
+    this.outputConsole = document.createElement("p");
+    this.outputContainer.appendChild(this.outputConsole);
+    this.outputContainer.classList.add("output");
+    document.body.appendChild(this.outputContainer);
+
     // dimensions
 
     this.mapWidth = width;
@@ -21,8 +28,9 @@ export default class Context {
     this.zeroX = 0;
     this.zeroY = 0;
     this.tileSize = 0;
-
     this.updateDimensions();
+
+    this.reset();
   }
 
   reset() {
@@ -69,6 +77,10 @@ export default class Context {
     sprite.anchor.set(0.5);
     this.app.stage.addChild(sprite);
     return sprite;
+  }
+
+  write(text) {
+    this.outputConsole.innerHTML = text;
   }
 }
 
