@@ -23,11 +23,10 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Build
-        run: npm i && npm run build
-        
+        run: npm i && npm run build && ls
+
       - name: Download a Build Artifact
         uses: actions/download-artifact@v3.0.0
-        run: ls -R
         with:
           # Artifact name
           name: dist
