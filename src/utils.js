@@ -3,6 +3,16 @@ export default class Position {
     this.x = typeof x === "number" ? x : 0;
     this.y = typeof y === "number" ? y : 0;
   }
+
+  set(x) {
+    this.x = x;
+    this.y = x;
+  }
+
+  zero() {
+    this.x = 0;
+    this.y = 0;
+  }
 }
 
 export const Direction = {

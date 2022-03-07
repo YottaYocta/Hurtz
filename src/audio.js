@@ -16,10 +16,11 @@ export default class Audio {
       });
   }
 
-  start(sequence) {
+  start(sequence, callback) {
     Tone.Transport.scheduleRepeat((time) => {
       let matrix = sequence.getCurrent();
       this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
+      callback();
     }, "1:0:0");
     Tone.Transport.start();
   }

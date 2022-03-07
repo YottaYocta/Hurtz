@@ -47,22 +47,22 @@ export default class Game {
           switch (e.key) {
             case "h":
               {
-                this.moveEntity(this.player, Direction.Left);
+                this.scheduleMove(this.player, Direction.Left);
               }
               break;
             case "j":
               {
-                this.moveEntity(this.player, Direction.Down);
+                this.scheduleMove(this.player, Direction.Down);
               }
               break;
             case "k":
               {
-                this.moveEntity(this.player, Direction.Up);
+                this.scheduleMove(this.player, Direction.Up);
               }
               break;
             case "l":
               {
-                this.moveEntity(this.player, Direction.Right);
+                this.scheduleMove(this.player, Direction.Right);
               }
               break;
             case "q":
@@ -83,6 +83,16 @@ export default class Game {
     }
   }
 
+  nextTurn() {
+    this.moveEntities();
+  }
+
+  moveEntities() {
+    for (let [position, entity] of Entity.entities) {
+      entity.move();
+    }
+  }
+
   setMode(mode) {
     switch (mode) {
       case GameMode.Start:
@@ -94,7 +104,7 @@ export default class Game {
       case GameMode.Play:
         {
           this.ctx.write("USE VIKEYS OR WASD TO MOVE");
-          this.audio.start(this.sequence);
+          this.audio.start(this.sequence, this.nextTurn.bind(this));
         }
         break;
       case GameMode.Reset: {
@@ -134,26 +144,26 @@ export default class Game {
     }
   }
 
-  moveEntity(entity, direction) {
+  scheduleMove(entity, direction) {
     switch (direction) {
       case Direction.Left:
         {
-          if (entity.position.x > 0) entity.position.x--;
+          if (entity.position.x > 0) entity.target.x--;
         }
         break;
       case Direction.Down:
         {
-          if (entity.position.y < this.mapHeight - 1) entity.position.y++;
+          if (entity.position.y < this.mapHeight - 1) entity.target.y++;
         }
         break;
       case Direction.Up:
         {
-          if (entity.position.y > 0) entity.position.y--;
+          if (entity.position.y > 0) entity.target.y--;
         }
         break;
       case Direction.Right:
         {
-          if (entity.position.x < this.mapWidth - 1) entity.position.x++;
+          if (entity.position.x < this.mapWidth - 1) entity.target.x++;
         }
         break;
     }
