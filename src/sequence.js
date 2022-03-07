@@ -1,18 +1,18 @@
 export default class Sequence {
   constructor() {
     this.currentNote = 0;
-    this.base = []; 
+    this.base = [];
   }
 
   createMeasure() {
     for (let i = 0; i < 4; i++) {
-      this.base.push(new Note('C1', Instruments.Bass));
+      this.base.push(new Note("C1", Instruments.Bass));
     }
   }
 
   getCurrent() {
     const notes = {
-      bass: this.base[this.currentNote]
+      bass: this.base[this.currentNote],
     };
     this.currentNote++;
     this.currentNote %= this.base.length;
@@ -28,5 +28,5 @@ export class Note {
 }
 
 export const Instruments = {
-  Bass: 1, 
-}
+  Bass: 1,
+};

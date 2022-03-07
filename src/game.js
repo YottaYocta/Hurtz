@@ -1,6 +1,6 @@
 import Context, { Resources } from "./context";
 import Audio from "./audio";
-import Sequence from './sequence';
+import Sequence from "./sequence";
 import Entity from "./entity";
 import { Direction } from "./utils";
 
