@@ -3,7 +3,7 @@ import Audio from "./audio";
 import Sequence, { Instrument } from "./sequence";
 import Entity from "./entity";
 import { Direction } from "./utils";
-import PulseManager, { PulseType } from './pulse';
+import PulseManager, { PulseType } from "./pulse";
 
 export default class Game {
   constructor() {
@@ -29,10 +29,9 @@ export default class Game {
   }
 
   reset() {
-
     this.ctx.reset();
     this.audio.reset(Math.floor(Math.random() * 50) + 250);
-    this.pulseManager.reset()
+    this.pulseManager.reset();
 
     Entity.entities.clear();
     this.player = new Entity(
@@ -44,7 +43,6 @@ export default class Game {
 
     this.sequence.reset();
     this.sequence.createBass();
-
   }
 
   processKey(e) {
@@ -183,49 +181,79 @@ export default class Game {
       case GameMode.Play:
         {
           this.ctx.write("USE VIKEYS OR WASD TO MOVE");
-          this.audio.start(this.sequence, this.handlePulse.bind(this), this.noteHandler.bind(this));
+          this.audio.start(
+            this.sequence,
+            this.handlePulse.bind(this),
+            this.noteHandler.bind(this)
+          );
         }
         break;
-      case GameMode.Reset: {
-        this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
-        this.audio.stop();
-      }; break;
+      case GameMode.Reset:
+        {
+          this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
+          this.audio.stop();
+        }
+        break;
     }
     this.mode = mode;
   }
 
   noteHandler(note) {
     switch (note.instrument) {
-      case Instrument.BassBasic: {
-        this.spawnPulse(PulseType.Axis, 3)
-      }; break;
+      case Instrument.BassBasic:
+        {
+          this.spawnPulse(PulseType.Axis, 3);
+        }
+        break;
     }
   }
 
   spawnPulse(type, range) {
     switch (type) {
-      case PulseType.Axis: {
-        for (let i = this.player.position.x - range; i < this.player.position.x; i++) {
-          this.createPulse({x: i, y: this.player.position.y});
+      case PulseType.Axis:
+        {
+          for (
+            let i = this.player.position.x - range;
+            i < this.player.position.x;
+            i++
+          ) {
+            this.createPulse({ x: i, y: this.player.position.y });
+          }
+          for (
+            let i = this.player.position.x + 1;
+            i <= this.player.position.x + range;
+            i++
+          ) {
+            this.createPulse({ x: i, y: this.player.position.y });
+          }
+          for (
+            let i = this.player.position.y - range;
+            i < this.player.position.y;
+            i++
+          ) {
+            this.createPulse({ x: this.player.position.x, y: i });
+          }
+          for (
+            let i = this.player.position.y + 1;
+            i <= this.player.position.y + range;
+            i++
+          ) {
+            this.createPulse({ x: this.player.position.x, y: i });
+          }
         }
-        for (let i = this.player.position.x + 1; i <= this.player.position.x + range; i++) {
-          this.createPulse({x: i, y: this.player.position.y});
-        }
-        for (let i = this.player.position.y - range; i < this.player.position.y; i++) {
-          this.createPulse({x: this.player.position.x, y: i});
-        }
-        for (let i = this.player.position.y + 1; i <= this.player.position.y + range; i++) {
-          this.createPulse({x: this.player.position.x, y: i});
-        }
-      }; break;
+        break;
     }
   }
 
   createPulse(position) {
-    if (position.x < 0 || position.x >= this.mapWidth ||
-        position.y < 0 || position.y >= this.mapHeight)
+    if (
+      position.x < 0 ||
+      position.x >= this.mapWidth ||
+      position.y < 0 ||
+      position.y >= this.mapHeight
+    )
       return;
-    let sprite = this.pulseManager.usePulse(); 
+    let sprite = this.pulseManager.usePulse();
     if (!sprite) {
       sprite = this.ctx.createSprite(Resources.wizard);
       this.pulseManager.add(sprite);
@@ -264,7 +292,6 @@ export default class Game {
     }
     this.pulseManager.updatePulses();
   }
-
 }
 
 const GameMode = {

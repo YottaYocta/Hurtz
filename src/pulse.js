@@ -13,7 +13,7 @@ export default class PulseManager {
   }
 
   usePulse() {
-    return this.pulses.find(sprite => sprite.alpha < 0.01);
+    return this.pulses.find((sprite) => sprite.alpha < 0.01);
   }
 
   updatePulses() {
