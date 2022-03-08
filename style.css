@@ -6,9 +6,13 @@
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  background: #3c3836;
-  color: #928374;
+  background: #3b324a;
+  color: #5c6182;
   overflow: hidden;
+}
+
+svg {
+  stroke: #5c6182;
 }
 
 body {
@@ -22,11 +26,10 @@ body {
 .canvas {
   padding: 1rem;
   margin: 1rem;
-  border: #928374 solid 0.5rem;
+  border: #5c6182 solid 0.5rem;
 }
 
 .console {
   width: 85%;
   height: 3rem;
 }
-

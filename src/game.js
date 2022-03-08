@@ -37,13 +37,48 @@ export default class Game {
     this.player = new Entity(
       Math.floor(Math.random() * this.mapWidth),
       Math.floor(Math.random() * this.mapHeight),
-      this.ctx.createSprite(Resources.wizard),
+      this.ctx.createSprite(Resources.Wizard),
       this.updateUI.bind(this)
     );
 
     this.sequence.reset();
     this.sequence.createBass();
   }
+
+  // RENDERING
+
+  tick() {
+    switch (this.mode) {
+      case GameMode.Start:
+        {
+        }
+        break;
+      case GameMode.Play:
+        {
+          this.updateScene();
+          this.ctx.updateTileSize();
+          window.requestAnimationFrame(this.tick.bind(this));
+        }
+        break;
+      case GameMode.Reset:
+        {
+        }
+        break;
+    }
+  }
+
+  updateScene() {
+    for (let [position, entity] of Entity.entities) {
+      this.ctx.updateSprite(
+        entity.position.x,
+        entity.position.y,
+        entity.sprite
+      );
+    }
+    this.pulseManager.updatePulses();
+  }
+
+  // INPUT AND TURNS
 
   processKey(e) {
     switch (this.mode) {
@@ -124,11 +159,6 @@ export default class Game {
     }
   }
 
-  handlePulse() {
-    this.moveEntities();
-    this.pulseEntities();
-  }
-
   moveEntities() {
     for (let [position, entity] of Entity.entities) {
       entity.move();
@@ -141,10 +171,6 @@ export default class Game {
       if (entity.position.x >= this.mapWidth)
         entity.position = { x: this.mapWidth - 1, y: entity.position.y };
     }
-  }
-
-  pulseEntities() {
-    this.ctx.tileSize += 6;
   }
 
   updateUI() {
@@ -198,11 +224,20 @@ export default class Game {
     this.mode = mode;
   }
 
+  handlePulse() {
+    this.moveEntities();
+    this.pulseEntities();
+  }
+
+  pulseEntities() {
+    this.ctx.tileSize += 6;
+  }
+
   noteHandler(note) {
     switch (note.instrument) {
       case Instrument.BassBasic:
         {
-          this.spawnPulse(PulseType.Axis, 3);
+          this.spawnPulse(PulseType.Axis, 1);
         }
         break;
     }
@@ -255,42 +290,11 @@ export default class Game {
       return;
     let sprite = this.pulseManager.usePulse();
     if (!sprite) {
-      sprite = this.ctx.createSprite(Resources.wizard);
+      sprite = this.ctx.createSprite(Resources.Orange);
       this.pulseManager.add(sprite);
     }
     sprite.alpha = 1;
     this.ctx.setSprite(position.x, position.y, sprite);
-  }
-
-  tick() {
-    switch (this.mode) {
-      case GameMode.Start:
-        {
-        }
-        break;
-      case GameMode.Play:
-        {
-          this.updateScene();
-          this.ctx.updateTileSize();
-          window.requestAnimationFrame(this.tick.bind(this));
-        }
-        break;
-      case GameMode.Reset:
-        {
-        }
-        break;
-    }
-  }
-
-  updateScene() {
-    for (let [position, entity] of Entity.entities) {
-      this.ctx.updateSprite(
-        entity.position.x,
-        entity.position.y,
-        entity.sprite
-      );
-    }
-    this.pulseManager.updatePulses();
   }
 }
 

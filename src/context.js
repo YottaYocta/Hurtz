@@ -1,12 +1,13 @@
 import * as PIXI from "pixi.js";
 import wizardUrl from "../assets/wizard.png";
+import orangeUrl from "../assets/orange.png";
 
 export default class Context {
   constructor(width, height) {
     // pixi.js context
 
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    this.app = new PIXI.Application({ backgroundColor: 0x3c3836 });
+    this.app = new PIXI.Application({ backgroundColor: 0x3b324a });
     this.app.autoDensity = true;
     document.body.appendChild(this.app.view);
     this.app.view.classList.add("canvas");
@@ -16,7 +17,7 @@ export default class Context {
     this.outputContainer = document.createElement("div");
     this.outputConsole = document.createElement("p");
     this.outputContainer.appendChild(this.outputConsole);
-    this.outputContainer.classList.add('console');
+    this.outputContainer.classList.add("console");
     document.body.appendChild(this.outputContainer);
 
     // dimensions
@@ -107,7 +108,8 @@ export default class Context {
 }
 
 export const Resources = {
-  wizard: wizardUrl,
+  Wizard: wizardUrl,
+  Orange: orangeUrl,
 };
 
 export const Icons = {

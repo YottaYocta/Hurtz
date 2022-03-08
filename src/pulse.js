@@ -18,7 +18,7 @@ export default class PulseManager {
 
   updatePulses() {
     for (let sprite of this.pulses) {
-      if (sprite.alpha > 0.01) {
+      if (sprite.alpha > 0.001) {
         sprite.alpha /= 1.1;
       }
     }

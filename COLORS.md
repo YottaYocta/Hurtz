@@ -1,11 +1,9 @@
 # The Color Pallete:
 
-background: 282828
-dark gray: 3c3836
-gray: 928374
-red: cc241d
-green: 98971a
-yellow: d79921
-blue: 458588
-purple: b16286
-aqua: 689d6a
+Dark: 3b324a
+Light: 5c6182
+Red: d47564
+Orange: e8c498
+Beige: ecece0
+Teal: 4fa4a5
+Mint: aad395
