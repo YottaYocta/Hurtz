@@ -8,10 +8,10 @@
   padding: 0;
   background: #3c3836;
   color: #928374;
+  overflow: hidden;
 }
 
 body {
-  width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,10 +19,14 @@ body {
   justify-content: center;
 }
 
-.output {
+.canvas {
   padding: 1rem;
   margin: 1rem;
   border: #928374 solid 0.5rem;
-  min-width: 30vw;
-  min-height: 3rem;
 }
+
+.console {
+  width: 85%;
+  height: 3rem;
+}
+

@@ -9,14 +9,14 @@ export default class Context {
     this.app = new PIXI.Application({ backgroundColor: 0x3c3836 });
     this.app.autoDensity = true;
     document.body.appendChild(this.app.view);
-    this.app.view.classList.add("output");
+    this.app.view.classList.add("canvas");
 
     // output console
 
     this.outputContainer = document.createElement("div");
     this.outputConsole = document.createElement("p");
     this.outputContainer.appendChild(this.outputConsole);
-    this.outputContainer.classList.add("output");
+    this.outputContainer.classList.add('console');
     document.body.appendChild(this.outputContainer);
 
     // dimensions
@@ -41,8 +41,8 @@ export default class Context {
   }
 
   updateDimensions() {
-    let sw = window.innerWidth / 2;
-    let sh = window.innerHeight / 2;
+    let sw = window.innerWidth / 1.2;
+    let sh = window.innerHeight / 1.2;
     if (sw !== 0 && sh !== 0) {
       if (this.mapWidth / this.mapHeight < sw / sh) {
         this.canvasHeight = sh;
