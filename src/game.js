@@ -126,8 +126,9 @@ export default class Game {
     }
   }
 
-  nextTurn() {
+  handlePulse() {
     this.moveEntities();
+    this.pulseEntities();
   }
 
   moveEntities() {
@@ -142,6 +143,10 @@ export default class Game {
       if (entity.position.x >= this.mapWidth)
         entity.position = { x: this.mapWidth - 1, y: entity.position.y };
     }
+  }
+
+  pulseEntities() {
+    this.ctx.tileSize += 6;
   }
 
   updateUI() {
@@ -178,7 +183,7 @@ export default class Game {
       case GameMode.Play:
         {
           this.ctx.write("USE VIKEYS OR WASD TO MOVE");
-          this.audio.start(this.sequence, this.nextTurn.bind(this), this.noteHandler.bind(this));
+          this.audio.start(this.sequence, this.handlePulse.bind(this), this.noteHandler.bind(this));
         }
         break;
       case GameMode.Reset: {
@@ -238,6 +243,7 @@ export default class Game {
       case GameMode.Play:
         {
           this.updateScene();
+          this.ctx.updateTileSize();
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;

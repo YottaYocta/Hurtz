@@ -28,6 +28,8 @@ export default class Context {
     this.zeroX = 0;
     this.zeroY = 0;
     this.tileSize = 0;
+    this.targetTileSize = 0;
+
     this.updateDimensions();
 
     this.reset();
@@ -45,11 +47,11 @@ export default class Context {
       if (this.mapWidth / this.mapHeight < sw / sh) {
         this.canvasHeight = sh;
         this.canvasWidth = sh * (this.mapWidth / this.mapHeight);
-        this.tileSize = this.canvasHeight / this.mapHeight;
+        this.targetTileSize = this.canvasHeight / this.mapHeight;
       } else {
         this.canvasHeight = sw / (this.mapWidth / this.mapHeight);
         this.canvasWidth = sw;
-        this.tileSize = this.canvasWidth / this.mapWidth;
+        this.targetTileSize = this.canvasWidth / this.mapWidth;
       }
       this.app.renderer.resize(this.canvasWidth, this.canvasHeight);
     }
@@ -59,10 +61,10 @@ export default class Context {
     if (sprite !== null && sprite !== undefined) {
       sprite.width = this.tileSize;
       sprite.height = this.tileSize;
-      x *= this.tileSize;
-      x += this.tileSize / 2;
-      y *= this.tileSize;
-      y += this.tileSize / 2;
+      x *= this.targetTileSize;
+      x += this.targetTileSize / 2;
+      y *= this.targetTileSize;
+      y += this.targetTileSize / 2;
       if (Math.abs(x - sprite.x) > 1 || Math.abs(y - sprite.y) > 1) {
         let diffX = x - sprite.x;
         let diffY = y - sprite.y;
@@ -74,14 +76,21 @@ export default class Context {
 
   setSprite(x, y, sprite) {
     if (sprite !== null && sprite !== undefined) {
-      sprite.width = this.tileSize;
-      sprite.height = this.tileSize;
-      x *= this.tileSize;
-      x += this.tileSize / 2;
-      y *= this.tileSize;
-      y += this.tileSize / 2;
+      sprite.width = this.targetTileSize;
+      sprite.height = this.targetTileSize;
+      x *= this.targetTileSize;
+      x += this.targetTileSize / 2;
+      y *= this.targetTileSize;
+      y += this.targetTileSize / 2;
       sprite.x = x;
       sprite.y = y;
+    }
+  }
+
+  updateTileSize() {
+    let diff = this.targetTileSize - this.tileSize;
+    if (Math.abs(diff) > 0.1) {
+      this.tileSize += diff / 5;
     }
   }
 
