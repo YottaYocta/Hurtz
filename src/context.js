@@ -6,7 +6,7 @@ export default class Context {
     // pixi.js context
 
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    this.app = new PIXI.Application({ backgroundColor: 0x282828 });
+    this.app = new PIXI.Application({ backgroundColor: 0x3c3836 });
     this.app.autoDensity = true;
     document.body.appendChild(this.app.view);
     this.app.view.classList.add("output");
