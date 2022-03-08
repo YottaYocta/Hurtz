@@ -16,16 +16,23 @@ export default class Audio {
       });
   }
 
-  start(sequence, callback) {
+  start(sequence, callback, noteHandler) {
     Tone.Transport.scheduleRepeat((time) => {
       let matrix = sequence.getCurrent();
-      this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
-      callback();
+      if (matrix && matrix.bass) {
+        callback();
+        noteHandler(matrix.bass);
+        this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
+      }
     }, "1:0:0");
     Tone.Transport.start();
   }
 
   stop() {
     Tone.Transport.stop();
+  }
+
+  reset(bpm) {
+    this.bpm = bpm;
   }
 }

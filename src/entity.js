@@ -7,7 +7,6 @@ export default class Entity {
     this.target = new Position(0, 0);
     this.sprite = sprite;
     this.updateCallback = updateCallback;
-    console.log(updateCallback);
     Entity.entities.set(this.position, this);
   }
 

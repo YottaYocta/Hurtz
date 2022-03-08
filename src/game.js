@@ -1,8 +1,9 @@
 import Context, { Resources, Icons } from "./context";
 import Audio from "./audio";
-import Sequence from "./sequence";
+import Sequence, { Instrument } from "./sequence";
 import Entity from "./entity";
 import { Direction } from "./utils";
+import PulseManager, { PulseType } from './pulse';
 
 export default class Game {
   constructor() {
@@ -12,12 +13,12 @@ export default class Game {
     // graphics
 
     this.ctx = new Context(this.mapWidth, this.mapHeight);
+    this.pulseManager = new PulseManager();
 
     // audio
 
-    this.audio = new Audio(Math.floor(Math.random() * 100) + 200);
+    this.audio = new Audio(Math.floor(Math.random() * 50) + 250);
     this.sequence = new Sequence();
-    this.sequence.createMeasure();
 
     window.addEventListener("resize", () => {
       this.ctx.updateDimensions();
@@ -28,14 +29,22 @@ export default class Game {
   }
 
   reset() {
+
     this.ctx.reset();
+    this.audio.reset(Math.floor(Math.random() * 50) + 250);
+    this.pulseManager.reset()
+
     Entity.entities.clear();
     this.player = new Entity(
-      0,
-      0,
+      Math.floor(Math.random() * this.mapWidth),
+      Math.floor(Math.random() * this.mapHeight),
       this.ctx.createSprite(Resources.wizard),
       this.updateUI.bind(this)
     );
+
+    this.sequence.reset();
+    this.sequence.createBass();
+
   }
 
   processKey(e) {
@@ -83,6 +92,35 @@ export default class Game {
           this.reset();
           this.setMode(GameMode.Play);
           window.requestAnimationFrame(this.tick.bind(this));
+        }
+        break;
+    }
+  }
+
+  scheduleMove(entity, direction) {
+    switch (direction) {
+      case Direction.Left:
+        {
+          if (entity.position.x > 0)
+            entity.target = { x: entity.target.x - 1, y: entity.target.y };
+        }
+        break;
+      case Direction.Down:
+        {
+          if (entity.position.y < this.mapHeight - 1)
+            entity.target = { x: entity.target.x, y: entity.target.y + 1 };
+        }
+        break;
+      case Direction.Up:
+        {
+          if (entity.position.y > 0)
+            entity.target = { x: entity.target.x, y: entity.target.y - 1 };
+        }
+        break;
+      case Direction.Right:
+        {
+          if (entity.position.x < this.mapWidth - 1)
+            entity.target = { x: entity.target.x + 1, y: entity.target.y };
         }
         break;
     }
@@ -140,15 +178,55 @@ export default class Game {
       case GameMode.Play:
         {
           this.ctx.write("USE VIKEYS OR WASD TO MOVE");
-          this.audio.start(this.sequence, this.nextTurn.bind(this));
+          this.audio.start(this.sequence, this.nextTurn.bind(this), this.noteHandler.bind(this));
         }
         break;
       case GameMode.Reset: {
         this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
         this.audio.stop();
-      }
+      }; break;
     }
     this.mode = mode;
+  }
+
+  noteHandler(note) {
+    switch (note.instrument) {
+      case Instrument.BassBasic: {
+        this.spawnPulse(PulseType.Axis, 3)
+      }; break;
+    }
+  }
+
+  spawnPulse(type, range) {
+    switch (type) {
+      case PulseType.Axis: {
+        for (let i = this.player.position.x - range; i < this.player.position.x; i++) {
+          this.createPulse({x: i, y: this.player.position.y});
+        }
+        for (let i = this.player.position.x + 1; i <= this.player.position.x + range; i++) {
+          this.createPulse({x: i, y: this.player.position.y});
+        }
+        for (let i = this.player.position.y - range; i < this.player.position.y; i++) {
+          this.createPulse({x: this.player.position.x, y: i});
+        }
+        for (let i = this.player.position.y + 1; i <= this.player.position.y + range; i++) {
+          this.createPulse({x: this.player.position.x, y: i});
+        }
+      }; break;
+    }
+  }
+
+  createPulse(position) {
+    if (position.x < 0 || position.x >= this.mapWidth ||
+        position.y < 0 || position.y >= this.mapHeight)
+      return;
+    let sprite = this.pulseManager.usePulse(); 
+    if (!sprite) {
+      sprite = this.ctx.createSprite(Resources.wizard);
+      this.pulseManager.add(sprite);
+    }
+    sprite.alpha = 1;
+    this.ctx.setSprite(position.x, position.y, sprite);
   }
 
   tick() {
@@ -178,36 +256,9 @@ export default class Game {
         entity.sprite
       );
     }
+    this.pulseManager.updatePulses();
   }
 
-  scheduleMove(entity, direction) {
-    switch (direction) {
-      case Direction.Left:
-        {
-          if (entity.position.x > 0)
-            entity.target = { x: entity.target.x - 1, y: entity.target.y };
-        }
-        break;
-      case Direction.Down:
-        {
-          if (entity.position.y < this.mapHeight - 1)
-            entity.target = { x: entity.target.x, y: entity.target.y + 1 };
-        }
-        break;
-      case Direction.Up:
-        {
-          if (entity.position.y > 0)
-            entity.target = { x: entity.target.x, y: entity.target.y - 1 };
-        }
-        break;
-      case Direction.Right:
-        {
-          if (entity.position.x < this.mapWidth - 1)
-            entity.target = { x: entity.target.x + 1, y: entity.target.y };
-        }
-        break;
-    }
-  }
 }
 
 const GameMode = {

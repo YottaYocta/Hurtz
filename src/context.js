@@ -72,6 +72,19 @@ export default class Context {
     }
   }
 
+  setSprite(x, y, sprite) {
+    if (sprite !== null && sprite !== undefined) {
+      sprite.width = this.tileSize;
+      sprite.height = this.tileSize;
+      x *= this.tileSize;
+      x += this.tileSize / 2;
+      y *= this.tileSize;
+      y += this.tileSize / 2;
+      sprite.x = x;
+      sprite.y = y;
+    }
+  }
+
   createSprite(url) {
     const sprite = PIXI.Sprite.from(url);
     sprite.anchor.set(0.5);
