@@ -1,4 +1,4 @@
-import Context, { Resources } from "./context";
+import Context, { Resources, Icons } from "./context";
 import Audio from "./audio";
 import Sequence from "./sequence";
 import Entity from "./entity";
@@ -109,33 +109,21 @@ export default class Game {
   updateUI() {
     let output = "";
     if (this.player.target.x > 0) {
-      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-right" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 7 12 12 7 17" />
-  <polyline points="13 7 18 12 13 17" />
-</svg> ${this.player.target.x}`;
+      output += `${Icons.Right}
+                  ${this.player.target.x}`;
     } else if (this.player.target.x < 0) {
-      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-left" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="11 7 6 12 11 17" />
-  <polyline points="17 7 12 12 17 17" />
-</svg> ${Math.abs(this.player.target.x)}`;
+      output += `${Icons.Left}
+                  ${Math.abs(this.player.target.x)}`;
     }
 
     output += "\n";
 
     if (this.player.target.y > 0) {
-      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-down" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 7 12 12 17 7" />
-  <polyline points="7 13 12 18 17 13" />
-</svg> ${this.player.target.y}`;
+      output += `${Icons.Down}
+                  ${this.player.target.y}`;
     } else if (this.player.target.y < 0) {
-      output += `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-up" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 11 12 6 17 11" />
-  <polyline points="7 17 12 12 17 17" />
-</svg> ${Math.abs(this.player.target.y)}`;
+      output += `${Icons.Up}
+                  ${Math.abs(this.player.target.y)}`;
     }
 
     this.ctx.write(output);

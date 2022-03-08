@@ -6,7 +6,8 @@
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  background: white;
+  background: #282828;
+  color: #928374;
 }
 
 body {
@@ -21,7 +22,7 @@ body {
 .output {
   padding: 1rem;
   margin: 1rem;
-  border: black solid 0.5rem;
+  border: #928374 solid 0.5rem;
   min-width: 30vw;
   min-height: 3rem;
 }
