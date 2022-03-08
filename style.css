@@ -30,6 +30,6 @@ body {
 }
 
 .console {
-  width: 85%;
   height: 3rem;
+  margin: 1rem;
 }

@@ -42,8 +42,8 @@ export default class Context {
   }
 
   updateDimensions() {
-    let sw = window.innerWidth / 1.2;
-    let sh = window.innerHeight / 1.2;
+    let sw = window.innerWidth / 2;
+    let sh = window.innerHeight / 2;
     if (sw !== 0 && sh !== 0) {
       if (this.mapWidth / this.mapHeight < sw / sh) {
         this.canvasHeight = sh;
