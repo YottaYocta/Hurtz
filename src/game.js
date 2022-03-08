@@ -86,7 +86,6 @@ export default class Game {
         {
           window.requestAnimationFrame(this.tick.bind(this));
           this.setMode(GameMode.Play);
-          this.reset();
         }
         break;
       case GameMode.Play:
@@ -122,7 +121,6 @@ export default class Game {
         break;
       case GameMode.Reset:
         {
-          this.reset();
           this.setMode(GameMode.Play);
           window.requestAnimationFrame(this.tick.bind(this));
         }
@@ -201,7 +199,7 @@ export default class Game {
       case GameMode.Start:
         {
           this.ctx.write("PRESS ANY KEY TO BEGIN");
-          this.audio.stop();
+          this.reset();
         }
         break;
       case GameMode.Play:
@@ -210,14 +208,14 @@ export default class Game {
           this.audio.start(
             this.sequence,
             this.handlePulse.bind(this),
-            this.noteHandler.bind(this)
+            this.handleNote.bind(this)
           );
         }
         break;
       case GameMode.Reset:
         {
           this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
-          this.audio.stop();
+          this.reset();
         }
         break;
     }
@@ -233,7 +231,7 @@ export default class Game {
     this.ctx.tileSize += 6;
   }
 
-  noteHandler(note) {
+  handleNote(note) {
     switch (note.instrument) {
       case Instrument.BassBasic:
         {

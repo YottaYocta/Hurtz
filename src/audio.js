@@ -7,6 +7,7 @@ export default class Audio {
         this.bpm = bpm;
         this.AMSynth = new Tone.AMSynth().toDestination();
         this.MembraneSynth = new Tone.MembraneSynth().toDestination();
+        this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
 
         console.log("tone context created");
@@ -17,7 +18,7 @@ export default class Audio {
   }
 
   start(sequence, callback, noteHandler) {
-    Tone.Transport.scheduleRepeat((time) => {
+    this.loop = Tone.Transport.scheduleRepeat((time) => {
       let matrix = sequence.getCurrent();
       if (matrix && matrix.bass) {
         callback();
@@ -34,5 +35,9 @@ export default class Audio {
 
   reset(bpm) {
     this.bpm = bpm;
+    this.stop();
+    if (this.loop != undefined && this.loop != null) {
+      Tone.Transport.clear(this.loop);
+    }
   }
 }
