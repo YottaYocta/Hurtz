@@ -10,6 +10,7 @@ export default class Game {
     this.mapWidth = 16;
     this.mapHeight = 8;
     this.map = new Arena(this.mapWidth, this.mapHeight);
+    this.round = 0;
     this.player = null;
     this.selectedEntity = null;
 
@@ -38,6 +39,7 @@ export default class Game {
 
     Entity.entities = [];
     this.map.clear();
+    this.round = 0;
 
     this.player = new Entity(
       new Position(
@@ -112,33 +114,40 @@ export default class Game {
       case GameMode.Play:
         {
           switch (e.key) {
-            case "a":
+            case "ArrowLeft":
             case "h":
               {
                 this.scheduleMove(this.player, Direction.Left);
               }
               break;
-            case "s":
+            case "ArrowDown":
             case "j":
               {
                 this.scheduleMove(this.player, Direction.Down);
               }
               break;
-            case "w":
+            case "ArrowUp":
             case "k":
               {
                 this.scheduleMove(this.player, Direction.Up);
               }
               break;
-            case "d":
+            case "ArrowRight":
             case "l":
               {
                 this.scheduleMove(this.player, Direction.Right);
               }
               break;
-            case "q": {
-              this.nextFocus();
-            }
+            case "q":
+              {
+                this.nextFocus(true);
+              }
+              break;
+            case "Q":
+              {
+                this.nextFocus(false);
+              }
+              break;
           }
         }
         break;
@@ -184,12 +193,14 @@ export default class Game {
     }
   }
 
-  nextFocus() {
+  nextFocus(forward) {
     if (Entity.entities.length > 0) {
       let index = Entity.entities.indexOf(this.selectedEntity);
       if (index >= 0) {
-        index++;
-        index %= Entity.entities.length;
+        if (forward) index++;
+        else index--;
+        if (index < 0) index = Entity.entities.length - 1;
+        else index %= Entity.entities.length;
         this.clearTint(this.selectedEntity);
         this.selectedEntity = Entity.entities[index];
       } else {
@@ -207,7 +218,7 @@ export default class Game {
       ${Icons.Heart} ${this.selectedEntity.health}
     `;
 
-    if (this.player.target.x > 0) {
+    if (this.selectedEntity.target.x > 0) {
       statusBar += `${Icons.Right}
                   ${this.selectedEntity.target.x}`;
     } else if (this.selectedEntity.target.x < 0) {
@@ -231,7 +242,7 @@ export default class Game {
       ? Info[this.selectedEntity.type].description
       : "";
 
-    this.ctx.write([statusBar, name, description]);
+    this.ctx.write([name, statusBar, description]);
   }
 
   setMode(mode) {
@@ -249,7 +260,7 @@ export default class Game {
             this.handlePulse.bind(this),
             this.handleNote.bind(this)
           );
-          this.nextLevel();
+          this.nextRound();
         }
         break;
       case GameMode.Reset:
@@ -276,43 +287,27 @@ export default class Game {
     switch (note.instrument) {
       case Instrument.BassBasic:
         {
-          this.spawnPulse(PulseType.Axis, 1);
+          this.spawnPulse(this.player.position, PulseType.Axis, 1);
         }
         break;
     }
   }
 
-  spawnPulse(type, range) {
+  spawnPulse(position, type, range) {
     switch (type) {
       case PulseType.Axis:
         {
-          for (
-            let i = this.player.position.x - range;
-            i < this.player.position.x;
-            i++
-          ) {
-            this.createPulse({ x: i, y: this.player.position.y });
+          for (let i = position.x - range; i < position.x; i++) {
+            this.createPulse({ x: i, y: position.y });
           }
-          for (
-            let i = this.player.position.x + 1;
-            i <= this.player.position.x + range;
-            i++
-          ) {
-            this.createPulse({ x: i, y: this.player.position.y });
+          for (let i = position.x + 1; i <= position.x + range; i++) {
+            this.createPulse({ x: i, y: position.y });
           }
-          for (
-            let i = this.player.position.y - range;
-            i < this.player.position.y;
-            i++
-          ) {
-            this.createPulse({ x: this.player.position.x, y: i });
+          for (let i = position.y - range; i < position.y; i++) {
+            this.createPulse({ x: position.x, y: i });
           }
-          for (
-            let i = this.player.position.y + 1;
-            i <= this.player.position.y + range;
-            i++
-          ) {
-            this.createPulse({ x: this.player.position.x, y: i });
+          for (let i = position.y + 1; i <= position.y + range; i++) {
+            this.createPulse({ x: position.x, y: i });
           }
         }
         break;
@@ -334,7 +329,7 @@ export default class Game {
     }
     sprite.alpha = 1;
     this.ctx.setSprite(position, sprite);
-    this.damageAt(position, Math.random() * 5 + 6);
+    this.damageAt(position, Math.floor(Math.random() * 5 + 7));
   }
 
   // ENEMIES AND COMBAT
@@ -384,7 +379,7 @@ export default class Game {
     }
 
     if ((Entity.entities.length === 1) & (Entity.entities[0] === this.player)) {
-      this.nextLevel();
+      this.nextRound();
     }
 
     this.updateUI();
@@ -411,15 +406,18 @@ export default class Game {
     }
   }
 
-  nextLevel() {
+  nextRound() {
     this.ctx.clean();
     this.spawnEnemies(2);
     this.audio.reset();
-    this.audio.start(
-      this.sequence,
-      this.handlePulse.bind(this),
-      this.handleNote.bind(this)
-    );
+    this.round++;
+    setTimeout(() => {
+      this.audio.start(
+        this.sequence,
+        this.handlePulse.bind(this),
+        this.handleNote.bind(this)
+      );
+    }, 500);
   }
 }
 
