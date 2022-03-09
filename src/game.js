@@ -302,7 +302,7 @@ export default class Game {
   spawnEnemies(num) {
     for (let i = 0; i < num; i++) {
       let pos = this.map.getEmpty();
-      let enemy = new Entity(pos.x, pos.y, this.ctx.createSprite(Resources.Wizard), this.entityChanged.bind(this), this.map); 
+      let enemy = new Entity(pos.x, pos.y, this.ctx.createSprite(Resources.Ghoul), this.entityChanged.bind(this), this.map); 
     }
   }
 

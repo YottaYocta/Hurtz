@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import wizardUrl from "../assets/wizard.png";
 import orangeUrl from "../assets/orange.png";
+import ghoulUrl from "../assets/ghoul.png";
 
 export default class Context {
   constructor(width, height) {
@@ -128,6 +129,7 @@ export default class Context {
 export const Resources = {
   Wizard: wizardUrl,
   Orange: orangeUrl,
+  Ghoul: ghoulUrl,
 };
 
 export const Icons = {
