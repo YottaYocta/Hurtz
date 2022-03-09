@@ -13,6 +13,10 @@ export default class Position {
     this.x = 0;
     this.y = 0;
   }
+
+  equals(pos) {
+    return pos.x === this.x && pos.y === this.y;
+  }
 }
 
 export const Direction = {

@@ -2,12 +2,15 @@ import * as PIXI from "pixi.js";
 import Position from "./utils";
 
 export default class Entity {
-  constructor(x, y, sprite, updateCallback) {
+  constructor(x, y, sprite, updateCallback, map) {
     this.position = new Position(x, y);
     this.target = new Position(0, 0);
+    this.health = 10;
     this.sprite = sprite;
     this.updateCallback = updateCallback;
-    Entity.entities.set(this.position, this);
+    this.map = map;
+    this.map.grid[y][x] = this;
+    Entity.entities.push(this);
   }
 
   get position() {
@@ -28,7 +31,13 @@ export default class Entity {
     this.triggerUpdate();
   }
 
+  damage(damage) {
+    this.health -= damage;
+    this.triggerUpdate();
+  }
+
   move() {
+    let originalPosition = new Position(this.position.x, this.position.y);
     if (this.target.x > 0) {
       this.position.x++;
       this.target.x--;
@@ -44,6 +53,17 @@ export default class Entity {
       this.position.y--;
       this.target.y++;
     }
+
+    if (!originalPosition.equals(this.position) && 
+        this.position.x >= 0 && this.position.x < this.map.width &&
+        this.position.y >= 0 && this.position.y < this.map.height &&
+      this.map.grid[this.position.y][this.position.x] === null) {
+      this.map.grid[originalPosition.y][originalPosition.x] = null;
+      this.map.grid[this.position.y][this.position.x] = this;
+    } else {
+      this.position = originalPosition;
+    }
+
     this.triggerUpdate();
   }
 
@@ -52,4 +72,28 @@ export default class Entity {
   }
 }
 
-Entity.entities = new Map();
+export class Arena {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+    this.grid = new Array(height);
+    for (let i = 0; i < height; i++)
+      this.grid[i] = new Array(width);
+  }
+
+  clear() {
+    for (let i = 0; i < this.height; i++)
+      for (let j = 0; j < this.width; j++)
+        this.grid[i][j] = null;
+  }
+
+  getEmpty() {
+    let pos = new Position(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
+    while (this.grid[pos.y][pos.x]) {
+      pos = new Position(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
+    }
+    return pos;
+  }
+}
+
+Entity.entities = [];

@@ -25,7 +25,7 @@ export default class Audio {
         noteHandler(matrix.bass);
         this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
       }
-    }, "1:0:0");
+    }, "1:0:0", "1:0:0");
     Tone.Transport.start();
   }
 

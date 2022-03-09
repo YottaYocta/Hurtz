@@ -1,14 +1,16 @@
 import Context, { Resources, Icons } from "./context";
 import Audio from "./audio";
 import Sequence, { Instrument } from "./sequence";
-import Entity from "./entity";
+import Entity, {Arena} from "./entity";
 import { Direction } from "./utils";
 import PulseManager, { PulseType } from "./pulse";
 
 export default class Game {
   constructor() {
+
     this.mapWidth = 16;
     this.mapHeight = 8;
+    this.map = new Arena(this.mapWidth, this.mapHeight);
 
     // graphics
 
@@ -33,12 +35,15 @@ export default class Game {
     this.audio.reset(Math.floor(Math.random() * 50) + 250);
     this.pulseManager.reset();
 
-    Entity.entities.clear();
+    Entity.entities = [];
+    this.map.clear();
+
     this.player = new Entity(
       Math.floor(Math.random() * this.mapWidth),
       Math.floor(Math.random() * this.mapHeight),
       this.ctx.createSprite(Resources.Wizard),
-      this.updateUI.bind(this)
+      this.playerChanged.bind(this),
+      this.map,
     );
 
     this.sequence.reset();
@@ -56,7 +61,6 @@ export default class Game {
       case GameMode.Play:
         {
           this.updateScene();
-          this.ctx.updateTileSize();
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
@@ -68,13 +72,14 @@ export default class Game {
   }
 
   updateScene() {
-    for (let [position, entity] of Entity.entities) {
+    for (let entity of Entity.entities) {
       this.ctx.updateSprite(
         entity.position.x,
         entity.position.y,
         entity.sprite
       );
     }
+    this.ctx.updateTileSize();
     this.pulseManager.updatePulses();
   }
 
@@ -158,16 +163,8 @@ export default class Game {
   }
 
   moveEntities() {
-    for (let [position, entity] of Entity.entities) {
+    for (let entity of Entity.entities) {
       entity.move();
-      if (entity.position.x < 0)
-        entity.position = { x: 0, y: entity.position.y };
-      if (entity.position.y < 0)
-        entity.position = { x: entity.position.x, y: 0 };
-      if (entity.position.y >= this.mapHeight)
-        entity.position = { x: entity.position.x, y: this.mapHeight - 1 };
-      if (entity.position.x >= this.mapWidth)
-        entity.position = { x: this.mapWidth - 1, y: entity.position.y };
     }
   }
 
@@ -199,17 +196,17 @@ export default class Game {
       case GameMode.Start:
         {
           this.ctx.write("PRESS ANY KEY TO BEGIN");
-          this.reset();
         }
         break;
       case GameMode.Play:
         {
-          this.ctx.write("USE VIKEYS OR WASD TO MOVE");
+          this.reset();
           this.audio.start(
             this.sequence,
             this.handlePulse.bind(this),
             this.handleNote.bind(this)
           );
+          this.nextLevel();
         }
         break;
       case GameMode.Reset:
@@ -293,11 +290,64 @@ export default class Game {
     }
     sprite.alpha = 1;
     this.ctx.setSprite(position.x, position.y, sprite);
+    this.damageAt(position, 10);
+  }
+
+  // ENEMIES AND COMBAT
+
+  playerChanged() {
+    this.updateUI();
+  }
+
+  spawnEnemies(num) {
+    for (let i = 0; i < num; i++) {
+      let pos = this.map.getEmpty();
+      let enemy = new Entity(pos.x, pos.y, this.ctx.createSprite(Resources.Wizard), this.entityChanged.bind(this), this.map); 
+    }
+  }
+
+  entityChanged() {
+    for (let entity of Entity.entities) {
+      if (entity.health <= 0)
+        this.killEntity(entity);
+    }
+
+    if (Entity.entities.length === 1 & Entity.entities[0] === this.player) {
+      this.nextLevel();
+    }
+  }
+
+  damageAt(position, damage) {
+    if (this.map.grid[position.y][position.x] !== null) {
+    console.log(position);
+      this.map.grid[position.y][position.x].damage(damage);
+    }
+  }
+
+  killEntity(entity) {
+    let index = Entity.entities.indexOf(entity);
+    if (index > -1) {
+      Entity.entities.splice(index, 1);
+    }
+    if (entity.sprite) {
+      entity.sprite.alpha = 0.4;
+    }
+    this.map.grid[entity.position.y][entity.position.x] = null;
+  }
+
+  nextLevel() {
+    this.ctx.clean();
+    this.ctx.removeAll(this.pulseManager.pulses);
+    this.pulseManager.reset();
+    this.spawnEnemies(2);
+    this.audio.reset();
+    this.audio.start(this.sequence, this.handlePulse.bind(this), this.handleNote.bind(this));
   }
 }
 
 const GameMode = {
   Start: 1,
-  Play: 2,
-  Reset: 3,
+  Shop: 2,
+  Play: 3,
+  Reset: 4,
 };

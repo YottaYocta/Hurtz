@@ -37,7 +37,6 @@ export default class Context {
   }
 
   reset() {
-    // graphics context
     this.app.stage.removeChildren();
   }
 
@@ -104,6 +103,25 @@ export default class Context {
 
   write(text) {
     this.outputConsole.innerHTML = text;
+  }
+
+  clean() {
+    let toRemove = [];
+    for (let sprite of this.app.stage.children) {
+      if (sprite.alpha < 0.5) {
+        toRemove.push(sprite);
+      }
+    }
+    for (let sprite of toRemove) {
+      this.app.stage.removeChild(sprite);
+    }
+  }
+
+  removeAll(sprites) {
+    for (let sprite of sprites)
+    {
+      this.app.stage.removeChild(sprite);
+    }
   }
 }
 
