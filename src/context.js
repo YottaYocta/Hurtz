@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import Position from './utils';
 import wizardUrl from "../assets/wizard.png";
 import orangeUrl from "../assets/orange.png";
 import ghoulUrl from "../assets/ghoul.png";
@@ -32,6 +33,8 @@ export default class Context {
     this.tileSize = 0;
     this.targetTileSize = 0;
 
+    this.morgue = [];
+
     this.updateDimensions();
 
     this.reset();
@@ -58,33 +61,35 @@ export default class Context {
     }
   }
 
-  updateSprite(x, y, sprite) {
+  updateSprite(position, sprite) {
+    position = new Position(position.x, position.y);
     if (sprite !== null && sprite !== undefined) {
       sprite.width = this.tileSize;
       sprite.height = this.tileSize;
-      x *= this.targetTileSize;
-      x += this.targetTileSize / 2;
-      y *= this.targetTileSize;
-      y += this.targetTileSize / 2;
-      if (Math.abs(x - sprite.x) > 1 || Math.abs(y - sprite.y) > 1) {
-        let diffX = x - sprite.x;
-        let diffY = y - sprite.y;
+      position.x *= this.targetTileSize;
+      position.x += this.targetTileSize / 2;
+      position.y *= this.targetTileSize;
+      position.y += this.targetTileSize / 2;
+      if (Math.abs(position.x - sprite.x) > 1 || Math.abs(position.y - sprite.y) > 1) {
+        let diffX = position.x - sprite.x;
+        let diffY = position.y - sprite.y;
         sprite.x += diffX / 3;
         sprite.y += diffY / 3;
       }
     }
   }
 
-  setSprite(x, y, sprite) {
+  setSprite(position, sprite) {
+    position = new Position(position.x, position.y);
     if (sprite !== null && sprite !== undefined) {
       sprite.width = this.targetTileSize;
       sprite.height = this.targetTileSize;
-      x *= this.targetTileSize;
-      x += this.targetTileSize / 2;
-      y *= this.targetTileSize;
-      y += this.targetTileSize / 2;
-      sprite.x = x;
-      sprite.y = y;
+      position.x *= this.targetTileSize;
+      position.x += this.targetTileSize / 2;
+      position.y *= this.targetTileSize;
+      position.y += this.targetTileSize / 2;
+      sprite.x = position.x;
+      sprite.y = position.y;
     }
   }
 
@@ -97,6 +102,8 @@ export default class Context {
 
   createSprite(url) {
     const sprite = PIXI.Sprite.from(url);
+    sprite.x = -100;
+    sprite.y = -100;
     sprite.anchor.set(0.5);
     this.app.stage.addChild(sprite);
     return sprite;
@@ -106,14 +113,12 @@ export default class Context {
     this.outputConsole.innerHTML = text;
   }
 
+  scheduleRemove(sprite) {
+    this.morgue.push(sprite);
+  }
+
   clean() {
-    let toRemove = [];
-    for (let sprite of this.app.stage.children) {
-      if (sprite.alpha < 0.5) {
-        toRemove.push(sprite);
-      }
-    }
-    for (let sprite of toRemove) {
+    for (let sprite of this.morgue) {
       this.app.stage.removeChild(sprite);
     }
   }
@@ -133,24 +138,19 @@ export const Resources = {
 };
 
 export const Icons = {
-  Up: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-up" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#928374" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 11 12 6 17 11" />
-  <polyline points="7 17 12 12 17 17" />
-</svg>`,
-  Down: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-down" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#928374" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 7 12 12 17 7" />
-  <polyline points="7 13 12 18 17 13" />
-</svg>`,
-  Left: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-left" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#928374" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="11 7 6 12 11 17" />
-  <polyline points="17 7 12 12 17 17" />
-</svg>`,
-  Right: `<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevrons-right" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#928374" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <polyline points="7 7 12 12 7 17" />
-  <polyline points="13 7 18 12 13 17" />
-</svg>`,
+  Up: `
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M7 16H5v-2h2v-2h2v-2h2V8h2v2h2v2h2v2h2v2h-2v-2h-2v-2h-2v-2h-2v2H9v2H7v2z" fill="currentColor"/> </svg>
+`,
+  Down: `
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M7 8H5v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2V8h-2v2h-2v2h-2v2h-2v-2H9v-2H7V8z" fill="currentColor"/> </svg>
+`,
+  Left: `
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M16 5v2h-2V5h2zm-4 4V7h2v2h-2zm-2 2V9h2v2h-2zm0 2H8v-2h2v2zm2 2v-2h-2v2h2zm0 0h2v2h-2v-2zm4 4v-2h-2v2h2z" fill="currentColor"/> </svg>
+`,
+  Right: `
+  <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M8 5v2h2V5H8zm4 4V7h-2v2h2zm2 2V9h-2v2h2zm0 2h2v-2h-2v2zm-2 2v-2h2v2h-2zm0 0h-2v2h2v-2zm-4 4v-2h2v2H8z" fill="currentColor"/> </svg>
+`,
+  Heart: `
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M9 2H5v2H3v2H1v6h2v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2V6h-2V4h-2V2h-4v2h-2v2h-2V4H9V2zm0 2v2h2v2h2V6h2V4h4v2h2v6h-2v2h-2v2h-2v2h-2v2h-2v-2H9v-2H7v-2H5v-2H3V6h2V4h4z" fill="currentColor"/> </svg>
+  `,
 };

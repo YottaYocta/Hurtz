@@ -9,9 +9,17 @@ export default class Position {
     this.y = x;
   }
 
+  add(x, y) {
+    return new Position(this.x + x, this.y + y);
+  }
+
   zero() {
     this.x = 0;
     this.y = 0;
+  }
+
+  manhattanDist(pos) {
+    return Math.abs(this.x - pos.x) + Math.abs(this.y - pos.y);
   }
 
   equals(pos) {

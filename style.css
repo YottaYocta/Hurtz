@@ -13,10 +13,14 @@
 
 svg {
   stroke: #5c6182;
+  width: 2rem;
+  height: 2rem;
 }
 
 body {
-  height: 100vh;
+  margin: auto;
+  height: min-content;
+  width: min-content;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,6 +34,8 @@ body {
 }
 
 .console {
-  height: 3rem;
+  width: 90%;
+  padding: 1rem;
   margin: 1rem;
+  min-height: 3rem;
 }

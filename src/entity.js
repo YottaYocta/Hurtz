@@ -2,14 +2,14 @@ import * as PIXI from "pixi.js";
 import Position from "./utils";
 
 export default class Entity {
-  constructor(x, y, sprite, updateCallback, map) {
-    this.position = new Position(x, y);
+  constructor(position, sprite, updateCallback, map) {
+    this.position = new Position(position.x, position.y);
     this.target = new Position(0, 0);
     this.health = 10;
     this.sprite = sprite;
     this.updateCallback = updateCallback;
     this.map = map;
-    this.map.grid[y][x] = this;
+    this.map.grid[position.y][position.x] = this;
     Entity.entities.push(this);
   }
 
@@ -46,6 +46,17 @@ export default class Entity {
       this.target.x++;
     }
 
+    if (!originalPosition.equals(this.position) && 
+        this.position.x >= 0 && this.position.x < this.map.width &&
+        this.position.y >= 0 && this.position.y < this.map.height &&
+      this.map.grid[this.position.y][this.position.x] === null) {
+      this.map.grid[originalPosition.y][originalPosition.x] = null;
+      this.map.grid[this.position.y][this.position.x] = this;
+    } else {
+      this.position = originalPosition;
+    }
+
+    originalPosition = new Position(this.position.x, this.position.y);
     if (this.target.y > 0) {
       this.position.y++;
       this.target.y--;
