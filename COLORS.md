@@ -1,7 +1,8 @@
 # The Color Pallete:
 
 Dark: 3b324a
-Light: 5c6182
+Mid: 5c6182
+Light: a7add1
 Red: d47564
 Orange: e8c498
 Beige: ecece0

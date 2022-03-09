@@ -9,6 +9,8 @@
   background: #3b324a;
   color: #5c6182;
   overflow: hidden;
+  font-size: 1.5vw;
+  line-height: 2vw;
 }
 
 svg {
@@ -35,7 +37,12 @@ body {
 
 .console {
   width: 90%;
-  padding: 1rem;
-  margin: 1rem;
+  display: flex;
   min-height: 3rem;
+  flex-direction: column;
+}
+
+.console-element {
+  margin: 0.5rem;
+  width: 90%;
 }

@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import Position from "./utils";
 
 export default class Entity {
-  constructor(position, sprite, updateCallback, map) {
+  constructor(position, sprite, updateCallback, map, type) {
     this.position = new Position(position.x, position.y);
     this.target = new Position(0, 0);
     this.health = 10;
@@ -10,6 +10,8 @@ export default class Entity {
     this.updateCallback = updateCallback;
     this.map = map;
     this.map.grid[position.y][position.x] = this;
+    this.type = type;
+
     Entity.entities.push(this);
   }
 
@@ -118,5 +120,23 @@ export class Arena {
     return pos;
   }
 }
+
+export const EntityType = {
+  Player: 0,
+  Ghoul: 1,
+};
+
+export const Info = [
+  // Player
+  {
+    name: "Player",
+    description: "A headbanging mage. Casts Spells to the beat.",
+  },
+  // Ghoul
+  {
+    name: "Ghoul",
+    description: "Your typical undead (Will bite).",
+  },
+];
 
 Entity.entities = [];

@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import Position from "./utils";
 import wizardUrl from "../assets/wizard.png";
-import orangeUrl from "../assets/orange.png";
+import eyeUrl from "../assets/eye.png";
 import ghoulUrl from "../assets/ghoul.png";
 
 export default class Context {
@@ -17,8 +17,6 @@ export default class Context {
     // output console
 
     this.outputContainer = document.createElement("div");
-    this.outputConsole = document.createElement("p");
-    this.outputContainer.appendChild(this.outputConsole);
     this.outputContainer.classList.add("console");
     document.body.appendChild(this.outputContainer);
 
@@ -103,17 +101,27 @@ export default class Context {
     }
   }
 
-  createSprite(url) {
+  createSprite(url, tint) {
     const sprite = PIXI.Sprite.from(url);
     sprite.x = -100;
     sprite.y = -100;
     sprite.anchor.set(0.5);
     this.app.stage.addChild(sprite);
+    if (tint) sprite.tint = tint;
+    else sprite.tint = Colors.Mid;
     return sprite;
   }
 
-  write(text) {
-    this.outputConsole.innerHTML = text;
+  write(texts) {
+    while (this.outputContainer.firstChild) {
+      this.outputContainer.removeChild(this.outputContainer.lastChild);
+    }
+    for (let text of texts) {
+      let paragraph = document.createElement("p");
+      paragraph.classList.add("console-element");
+      paragraph.innerHTML = text;
+      this.outputContainer.appendChild(paragraph);
+    }
   }
 
   scheduleRemove(sprite) {
@@ -135,7 +143,7 @@ export default class Context {
 
 export const Resources = {
   Wizard: wizardUrl,
-  Orange: orangeUrl,
+  Eye: eyeUrl,
   Ghoul: ghoulUrl,
 };
 
@@ -155,4 +163,16 @@ export const Icons = {
   Heart: `
 <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M9 2H5v2H3v2H1v6h2v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2V6h-2V4h-2V2h-4v2h-2v2h-2V4H9V2zm0 2v2h2v2h2V6h2V4h4v2h2v6h-2v2h-2v2h-2v2h-2v2h-2v-2H9v-2H7v-2H5v-2H3V6h2V4h4z" fill="currentColor"/> </svg>
   `,
+};
+
+export const Colors = {
+  Dark: 0x3b324a,
+  Mid: 0x5c6182,
+  Light: 0xa7add1,
+  Red: 0xd47564,
+  Orange: 0xe8c498,
+  Beige: 0xecece0,
+  Teal: 0x4fa4a5,
+  Mint: 0xaad395,
+  White: 0xffffff,
 };

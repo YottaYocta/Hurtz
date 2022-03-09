@@ -1,7 +1,7 @@
-import Context, { Resources, Icons } from "./context";
+import Context, { Resources, Icons, Colors } from "./context";
 import Audio from "./audio";
 import Sequence, { Instrument } from "./sequence";
-import Entity, { Arena } from "./entity";
+import Entity, { Arena, EntityType, Info } from "./entity";
 import Position, { Direction } from "./utils";
 import PulseManager, { PulseType } from "./pulse";
 
@@ -10,6 +10,8 @@ export default class Game {
     this.mapWidth = 16;
     this.mapHeight = 8;
     this.map = new Arena(this.mapWidth, this.mapHeight);
+    this.player = null;
+    this.selectedEntity = null;
 
     // graphics
 
@@ -43,9 +45,12 @@ export default class Game {
         Math.floor(Math.random() * this.mapHeight)
       ),
       this.ctx.createSprite(Resources.Wizard),
-      this.playerChanged.bind(this),
-      this.map
+      this.entityChanged.bind(this),
+      this.map,
+      EntityType.Player
     );
+
+    this.nextFocus();
 
     this.sequence.reset();
     this.sequence.createBass();
@@ -80,9 +85,23 @@ export default class Game {
     this.pulseManager.updatePulses();
   }
 
+  clearTint(entity) {
+    if (entity.sprite) {
+      switch (entity.type) {
+        case EntityType.Player:
+        case EntityType.Ghoul:
+          {
+            entity.sprite.tint = Colors.Mid;
+          }
+          break;
+      }
+    }
+  }
+
   // INPUT AND TURNS
 
   processKey(e) {
+    e.preventDefault();
     switch (this.mode) {
       case GameMode.Start:
         {
@@ -117,6 +136,9 @@ export default class Game {
                 this.scheduleMove(this.player, Direction.Right);
               }
               break;
+            case "q": {
+              this.nextFocus();
+            }
           }
         }
         break;
@@ -162,39 +184,61 @@ export default class Game {
     }
   }
 
-  updateUI() {
-    let output = "";
+  nextFocus() {
+    if (Entity.entities.length > 0) {
+      let index = Entity.entities.indexOf(this.selectedEntity);
+      if (index >= 0) {
+        index++;
+        index %= Entity.entities.length;
+        this.clearTint(this.selectedEntity);
+        this.selectedEntity = Entity.entities[index];
+      } else {
+        this.selectedEntity = this.player;
+      }
+      this.selectedEntity.sprite.tint = Colors.Light;
+      this.updateUI();
+    }
+  }
 
-    output += `
-      ${Icons.Heart} ${this.player.health}
+  updateUI() {
+    let statusBar = "";
+
+    statusBar += `
+      ${Icons.Heart} ${this.selectedEntity.health}
     `;
 
     if (this.player.target.x > 0) {
-      output += `${Icons.Right}
-                  ${this.player.target.x}`;
-    } else if (this.player.target.x < 0) {
-      output += `${Icons.Left}
-                  ${Math.abs(this.player.target.x)}`;
+      statusBar += `${Icons.Right}
+                  ${this.selectedEntity.target.x}`;
+    } else if (this.selectedEntity.target.x < 0) {
+      statusBar += `${Icons.Left}
+                  ${Math.abs(this.selectedEntity.target.x)}`;
     }
 
-    output += "\n";
+    statusBar += "\n";
 
-    if (this.player.target.y > 0) {
-      output += `${Icons.Down}
-                  ${this.player.target.y}`;
-    } else if (this.player.target.y < 0) {
-      output += `${Icons.Up}
-                  ${Math.abs(this.player.target.y)}`;
+    if (this.selectedEntity.target.y > 0) {
+      statusBar += `${Icons.Down}
+                  ${this.selectedEntity.target.y}`;
+    } else if (this.selectedEntity.target.y < 0) {
+      statusBar += `${Icons.Up}
+                  ${Math.abs(this.selectedEntity.target.y)}`;
     }
 
-    this.ctx.write(output);
+    let name = this.selectedEntity ? Info[this.selectedEntity.type].name : "";
+
+    let description = this.selectedEntity
+      ? Info[this.selectedEntity.type].description
+      : "";
+
+    this.ctx.write([statusBar, name, description]);
   }
 
   setMode(mode) {
     switch (mode) {
       case GameMode.Start:
         {
-          this.ctx.write("PRESS ANY KEY TO BEGIN");
+          this.ctx.write(["PRESS ANY KEY TO BEGIN"]);
         }
         break;
       case GameMode.Play:
@@ -211,7 +255,7 @@ export default class Game {
       case GameMode.Reset:
         {
           this.audio.stop();
-          this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
+          this.ctx.write(["PRESS ANY KEY TO PLAY AGAIN"]);
         }
         break;
     }
@@ -285,7 +329,7 @@ export default class Game {
       return;
     let sprite = this.pulseManager.usePulse();
     if (!sprite) {
-      sprite = this.ctx.createSprite(Resources.Orange);
+      sprite = this.ctx.createSprite(Resources.Eye, Colors.Orange);
       this.pulseManager.add(sprite);
     }
     sprite.alpha = 1;
@@ -299,6 +343,11 @@ export default class Game {
     for (let entity of Entity.entities.filter(
       (entity) => entity !== this.player
     )) {
+      if (entity.position.manhattanDist(this.player.position) <= 1) {
+        this.damageAt(this.player.position, 3);
+        continue;
+      }
+
       if (entity.position.x < this.player.position.x)
         entity.target = entity.target.add(1, 0);
       else if (entity.position.x > this.player.position.x)
@@ -308,16 +357,7 @@ export default class Game {
         entity.target = entity.target.add(0, 1);
       else if (entity.position.y > this.player.position.y)
         entity.target = entity.target.add(0, -1);
-
-      if (entity.position.manhattanDist(this.player.position) <= 1) {
-        this.damageAt(this.player.position, 3);
-      }
     }
-  }
-
-  playerChanged() {
-    if (this.player.health <= 0) this.setMode(GameMode.Reset);
-    else this.updateUI();
   }
 
   spawnEnemies(num) {
@@ -327,12 +367,18 @@ export default class Game {
         pos,
         this.ctx.createSprite(Resources.Ghoul),
         this.entityChanged.bind(this),
-        this.map
+        this.map,
+        EntityType.Ghoul
       );
     }
   }
 
   entityChanged() {
+    if (this.player.health <= 0) {
+      this.setMode(GameMode.Reset);
+      return;
+    }
+
     for (let entity of Entity.entities) {
       if (entity.health <= 0) this.killEntity(entity);
     }
@@ -340,6 +386,8 @@ export default class Game {
     if ((Entity.entities.length === 1) & (Entity.entities[0] === this.player)) {
       this.nextLevel();
     }
+
+    this.updateUI();
   }
 
   damageAt(position, damage) {
@@ -358,6 +406,9 @@ export default class Game {
       this.ctx.scheduleRemove(entity.sprite);
     }
     this.map.grid[entity.position.y][entity.position.x] = null;
+    if ((this.selectedEntity = entity)) {
+      this.nextFocus();
+    }
   }
 
   nextLevel() {
