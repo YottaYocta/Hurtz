@@ -18,14 +18,18 @@ export default class Audio {
   }
 
   start(sequence, callback, noteHandler) {
-    this.loop = Tone.Transport.scheduleRepeat((time) => {
-      let matrix = sequence.getCurrent();
-      if (matrix && matrix.bass) {
-        callback();
-        noteHandler(matrix.bass);
-        this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
-      }
-    }, "1:0:0", "1:0:0");
+    this.loop = Tone.Transport.scheduleRepeat(
+      (time) => {
+        let matrix = sequence.getCurrent();
+        if (matrix && matrix.bass) {
+          callback();
+          noteHandler(matrix.bass);
+          this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
+        }
+      },
+      "1:0:0",
+      "1:0:0"
+    );
     Tone.Transport.start();
   }
 

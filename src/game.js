@@ -1,13 +1,12 @@
 import Context, { Resources, Icons } from "./context";
 import Audio from "./audio";
 import Sequence, { Instrument } from "./sequence";
-import Entity, {Arena} from "./entity";
+import Entity, { Arena } from "./entity";
 import Position, { Direction } from "./utils";
 import PulseManager, { PulseType } from "./pulse";
 
 export default class Game {
   constructor() {
-
     this.mapWidth = 16;
     this.mapHeight = 8;
     this.map = new Arena(this.mapWidth, this.mapHeight);
@@ -39,11 +38,13 @@ export default class Game {
     this.map.clear();
 
     this.player = new Entity(
-      new Position(Math.floor(Math.random() * this.mapWidth),
-      Math.floor(Math.random() * this.mapHeight)),
+      new Position(
+        Math.floor(Math.random() * this.mapWidth),
+        Math.floor(Math.random() * this.mapHeight)
+      ),
       this.ctx.createSprite(Resources.Wizard),
       this.playerChanged.bind(this),
-      this.map,
+      this.map
     );
 
     this.sequence.reset();
@@ -73,10 +74,7 @@ export default class Game {
 
   updateScene() {
     for (let entity of Entity.entities) {
-      this.ctx.updateSprite(
-        entity.position,
-        entity.sprite
-      );
+      this.ctx.updateSprite(entity.position, entity.sprite);
     }
     this.ctx.updateTileSize();
     this.pulseManager.updatePulses();
@@ -131,8 +129,7 @@ export default class Game {
     switch (direction) {
       case Direction.Left:
         {
-          if (entity.position.x > 0)
-            entity.target = entity.target.add(-1, 0);
+          if (entity.position.x > 0) entity.target = entity.target.add(-1, 0);
         }
         break;
       case Direction.Down:
@@ -143,8 +140,7 @@ export default class Game {
         break;
       case Direction.Up:
         {
-          if (entity.position.y > 0)
-            entity.target = entity.target.add(0, -1);
+          if (entity.position.y > 0) entity.target = entity.target.add(0, -1);
         }
         break;
       case Direction.Right:
@@ -164,7 +160,7 @@ export default class Game {
 
   updateUI() {
     let output = "";
-    
+
     output += `
       ${Icons.Heart} ${this.player.health}
     `;
@@ -295,7 +291,9 @@ export default class Game {
   // ENEMIES AND COMBAT
 
   enemyAI() {
-    for (let entity of Entity.entities.filter(entity => entity !== this.player)) {
+    for (let entity of Entity.entities.filter(
+      (entity) => entity !== this.player
+    )) {
       if (entity.position.x < this.player.position.x)
         entity.target = entity.target.add(1, 0);
       else if (entity.position.x > this.player.position.x)
@@ -313,26 +311,28 @@ export default class Game {
   }
 
   playerChanged() {
-    if (this.player.health <= 0) 
-      this.setMode(GameMode.Reset);
-    else
-      this.updateUI();
+    if (this.player.health <= 0) this.setMode(GameMode.Reset);
+    else this.updateUI();
   }
 
   spawnEnemies(num) {
     for (let i = 0; i < num; i++) {
       let pos = this.map.getEmpty();
-      let enemy = new Entity(pos, this.ctx.createSprite(Resources.Ghoul), this.entityChanged.bind(this), this.map); 
+      let enemy = new Entity(
+        pos,
+        this.ctx.createSprite(Resources.Ghoul),
+        this.entityChanged.bind(this),
+        this.map
+      );
     }
   }
 
   entityChanged() {
     for (let entity of Entity.entities) {
-      if (entity.health <= 0)
-        this.killEntity(entity);
+      if (entity.health <= 0) this.killEntity(entity);
     }
 
-    if (Entity.entities.length === 1 & Entity.entities[0] === this.player) {
+    if ((Entity.entities.length === 1) & (Entity.entities[0] === this.player)) {
       this.nextLevel();
     }
   }
@@ -359,7 +359,11 @@ export default class Game {
     this.ctx.clean();
     this.spawnEnemies(2);
     this.audio.reset();
-    this.audio.start(this.sequence, this.handlePulse.bind(this), this.handleNote.bind(this));
+    this.audio.start(
+      this.sequence,
+      this.handlePulse.bind(this),
+      this.handleNote.bind(this)
+    );
   }
 }
 

@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import Position from './utils';
+import Position from "./utils";
 import wizardUrl from "../assets/wizard.png";
 import orangeUrl from "../assets/orange.png";
 import ghoulUrl from "../assets/ghoul.png";
@@ -70,7 +70,10 @@ export default class Context {
       position.x += this.targetTileSize / 2;
       position.y *= this.targetTileSize;
       position.y += this.targetTileSize / 2;
-      if (Math.abs(position.x - sprite.x) > 1 || Math.abs(position.y - sprite.y) > 1) {
+      if (
+        Math.abs(position.x - sprite.x) > 1 ||
+        Math.abs(position.y - sprite.y) > 1
+      ) {
         let diffX = position.x - sprite.x;
         let diffY = position.y - sprite.y;
         sprite.x += diffX / 3;
@@ -124,8 +127,7 @@ export default class Context {
   }
 
   removeAll(sprites) {
-    for (let sprite of sprites)
-    {
+    for (let sprite of sprites) {
       this.app.stage.removeChild(sprite);
     }
   }

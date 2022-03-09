@@ -46,10 +46,14 @@ export default class Entity {
       this.target.x++;
     }
 
-    if (!originalPosition.equals(this.position) && 
-        this.position.x >= 0 && this.position.x < this.map.width &&
-        this.position.y >= 0 && this.position.y < this.map.height &&
-      this.map.grid[this.position.y][this.position.x] === null) {
+    if (
+      !originalPosition.equals(this.position) &&
+      this.position.x >= 0 &&
+      this.position.x < this.map.width &&
+      this.position.y >= 0 &&
+      this.position.y < this.map.height &&
+      this.map.grid[this.position.y][this.position.x] === null
+    ) {
       this.map.grid[originalPosition.y][originalPosition.x] = null;
       this.map.grid[this.position.y][this.position.x] = this;
     } else {
@@ -65,10 +69,14 @@ export default class Entity {
       this.target.y++;
     }
 
-    if (!originalPosition.equals(this.position) && 
-        this.position.x >= 0 && this.position.x < this.map.width &&
-        this.position.y >= 0 && this.position.y < this.map.height &&
-      this.map.grid[this.position.y][this.position.x] === null) {
+    if (
+      !originalPosition.equals(this.position) &&
+      this.position.x >= 0 &&
+      this.position.x < this.map.width &&
+      this.position.y >= 0 &&
+      this.position.y < this.map.height &&
+      this.map.grid[this.position.y][this.position.x] === null
+    ) {
       this.map.grid[originalPosition.y][originalPosition.x] = null;
       this.map.grid[this.position.y][this.position.x] = this;
     } else {
@@ -88,20 +96,24 @@ export class Arena {
     this.width = width;
     this.height = height;
     this.grid = new Array(height);
-    for (let i = 0; i < height; i++)
-      this.grid[i] = new Array(width);
+    for (let i = 0; i < height; i++) this.grid[i] = new Array(width);
   }
 
   clear() {
     for (let i = 0; i < this.height; i++)
-      for (let j = 0; j < this.width; j++)
-        this.grid[i][j] = null;
+      for (let j = 0; j < this.width; j++) this.grid[i][j] = null;
   }
 
   getEmpty() {
-    let pos = new Position(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
+    let pos = new Position(
+      Math.floor(Math.random() * this.width),
+      Math.floor(Math.random() * this.height)
+    );
     while (this.grid[pos.y][pos.x]) {
-      pos = new Position(Math.floor(Math.random() * this.width), Math.floor(Math.random() * this.height));
+      pos = new Position(
+        Math.floor(Math.random() * this.width),
+        Math.floor(Math.random() * this.height)
+      );
     }
     return pos;
   }
