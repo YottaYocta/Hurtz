@@ -93,21 +93,25 @@ export default class Game {
       case GameMode.Play:
         {
           switch (e.key) {
+            case "a":
             case "h":
               {
                 this.scheduleMove(this.player, Direction.Left);
               }
               break;
+            case "s":
             case "j":
               {
                 this.scheduleMove(this.player, Direction.Down);
               }
               break;
+            case "w":
             case "k":
               {
                 this.scheduleMove(this.player, Direction.Up);
               }
               break;
+            case "d":
             case "l":
               {
                 this.scheduleMove(this.player, Direction.Right);
@@ -206,6 +210,7 @@ export default class Game {
         break;
       case GameMode.Reset:
         {
+          this.audio.stop();
           this.ctx.write("PRESS ANY KEY TO PLAY AGAIN");
         }
         break;
