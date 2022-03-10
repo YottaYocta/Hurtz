@@ -3,10 +3,9 @@ import Position from "./utils";
 
 export default class Entity {
   constructor(position, sprite, updateCallback, map, type) {
-
     this.position = new Position(position.x, position.y);
     this.target = new Position(0, 0);
-    this.health = 10;
+    this.health = 5;
     this.type = type;
 
     this.sprite = sprite;
@@ -139,7 +138,7 @@ export const EntityType = {
   NewBass: {
     name: "Enchantment - New Bass",
     description: "Replaces your current bassline with a new one.",
-  }
+  },
 };
 
 Entity.entities = [];

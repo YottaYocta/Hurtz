@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { Instrument } from './sequence';
+import { Instrument } from "./sequence";
 
 export default class Audio {
   constructor(bpm) {
@@ -19,36 +19,41 @@ export default class Audio {
   }
 
   start(sequence, callback, noteHandler) {
-    this.loop = Tone.Transport.scheduleRepeat(
-      (time) => {
-        let timeEight = Tone.Time("0:0:2").toSeconds();
-        callback();
+    this.loop = Tone.Transport.scheduleRepeat((time) => {
+      let timeEight = Tone.Time("0:0:2").toSeconds();
+      callback();
 
-        for (let i = 0; i < 8; i++) {
-        
-          let currentEighth = sequence.getCurrent(); 
-          
-          // BASS
+      for (let i = 0; i < 8; i++) {
+        let currentEighth = sequence.getCurrent();
 
-          if (currentEighth.bass && currentEighth.bass.note) {
-            switch (currentEighth.bass.instrument) {
-              case Instrument.BassBasic: {
-                this.membraneSynth.triggerAttackRelease(currentEighth.bass.note, '8n', time + i * timeEight);
-              }; break;
-              default: {
-                this.membraneSynth.triggerAttackRelease(currentEighth.bass.note, '8n', time + i * timeEight);
-                console.log('instrument does not exist');
-              };
+        // BASS
+
+        if (currentEighth.bass && currentEighth.bass.note) {
+          switch (currentEighth.bass.instrument) {
+            case Instrument.BassBasic:
+              {
+                this.membraneSynth.triggerAttackRelease(
+                  currentEighth.bass.note,
+                  "8n",
+                  time + i * timeEight
+                );
+              }
+              break;
+            default: {
+              this.membraneSynth.triggerAttackRelease(
+                currentEighth.bass.note,
+                "8n",
+                time + i * timeEight
+              );
+              console.log("instrument does not exist");
             }
-            Tone.Transport.scheduleOnce((time) => {
-              noteHandler(currentEighth.bass);
-            }, `+${timeEight * i}`);
           }
+          Tone.Transport.scheduleOnce((time) => {
+            noteHandler(currentEighth.bass);
+          }, `+${timeEight * i}`);
         }
-
-      },
-      "1:0:0",
-    );
+      }
+    }, "1:0:0");
     Tone.Transport.start();
   }
 

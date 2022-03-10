@@ -1,4 +1,3 @@
-
 const maxSequenceLength = 8 * 4;
 
 export default class Sequence {
@@ -24,21 +23,21 @@ export default class Sequence {
 export function createBass(strength) {
   let bass = [];
   if (!strength) {
-    for (let i = 0; i < maxSequenceLength; i++) { // generation is done by eigth notes
+    for (let i = 0; i < maxSequenceLength; i++) {
+      // generation is done by eigth notes
       let note = null;
-      if (i % 4 == 0) 
-        note = 'C1';
+      if (i % 4 == 0) note = "C1";
       bass.push(new Note(note, Instrument.BassBasic));
     }
     return bass;
   }
-  for (let i = 0; i < maxSequenceLength; i++) { // generation is done by eigth notes
+  for (let i = 0; i < maxSequenceLength; i++) {
+    // generation is done by eigth notes
     let active = strength / 20;
     if (i % 4 == 0) active = 1;
     if (i % 2 == 0) active += 0.3;
-    let note = null
-    if (active > Math.random())
-      note = 'C1'
+    let note = null;
+    if (active > Math.random()) note = "C1";
     bass.push(new Note(note, Instrument.BassBasic));
   }
   return bass;

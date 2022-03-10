@@ -63,18 +63,10 @@ export default class Game {
 
   tick() {
     switch (this.mode) {
-      case GameMode.Start:
-        {
-        }
-        break;
       case GameMode.Play:
         {
           this.updateScene();
           window.requestAnimationFrame(this.tick.bind(this));
-        }
-        break;
-      case GameMode.Reset:
-        {
         }
         break;
     }
@@ -91,9 +83,11 @@ export default class Game {
   clearTint(entity) {
     if (entity.sprite) {
       switch (entity.type) {
-        default: {
-          entity.sprite.tint = Colors.Mid;
-        }; break;
+        default:
+          {
+            entity.sprite.tint = Colors.Mid;
+          }
+          break;
       }
     }
   }
@@ -152,6 +146,7 @@ export default class Game {
       case GameMode.Reset:
         {
           this.setMode(GameMode.Play);
+          this.audio.stop();
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
@@ -263,8 +258,8 @@ export default class Game {
         break;
       case GameMode.Reset:
         {
-          this.audio.stop();
           this.ctx.write(["PRESS ANY KEY TO PLAY AGAIN"]);
+          this.audio.stop();
         }
         break;
     }
@@ -278,7 +273,7 @@ export default class Game {
   }
 
   handleNote(note) {
-    if (this.round % 2 == 1) {
+    if (this.round % 2 === 0) {
       this.spawnPulse(this.player.position, PulseType.Cross, 1);
     } else {
       switch (note.instrument) {
@@ -314,12 +309,24 @@ export default class Game {
         }
         break;
       case PulseType.Cross: {
-          for (let i = 0; i < range; i++) {
-            this.createPulse({ x: position.x - range + i, y: position.y - range + i }, 1);
-            this.createPulse({ x: position.x + range - i, y: position.y + range - i }, 1);
-            this.createPulse({ x: position.x - range + i, y: position.y + range - i }, 1);
-            this.createPulse({ x: position.x + range - i, y: position.y - range + i }, 1);
-          }
+        for (let i = 0; i < range; i++) {
+          this.createPulse(
+            { x: position.x - range + i, y: position.y - range + i },
+            1
+          );
+          this.createPulse(
+            { x: position.x + range - i, y: position.y + range - i },
+            1
+          );
+          this.createPulse(
+            { x: position.x - range + i, y: position.y + range - i },
+            1
+          );
+          this.createPulse(
+            { x: position.x + range - i, y: position.y - range + i },
+            1
+          );
+        }
       }
     }
   }
@@ -367,7 +374,7 @@ export default class Game {
   }
 
   spawnEntities() {
-    if (this.round % 2 == 0) {
+    if (this.round % 2 === 0) {
       let a = new Position(1, 1);
       let b = new Position(1, this.mapHeight - 2);
       let c = new Position(this.mapWidth - 2, this.mapHeight - 2);
@@ -400,7 +407,6 @@ export default class Game {
         this.map,
         EntityType.NewBass
       );
-
     } else {
       for (let i = 0; i < this.round / 2 + 1; i++) {
         let pos = this.map.getEmpty();
@@ -416,14 +422,17 @@ export default class Game {
   }
 
   entityChanged(entity) {
+    if (!this.player) {
+      this.ctx.write(["PRESS ANY KEY TO START GAME"]);
+      return;
+    }
+    if (this.player.health <= 0) {
+      this.ctx.write(["PRESS ANY KEY TO PLAY AGAIN"]);
+      this.setMode(GameMode.Reset);
+      return;
+    }
     if (entity.health <= 0) {
       this.killEntity(entity);
-    } else if (this.round % 2 == 1) {
-      switch (entity.type) {
-        case EntityType.NewBass: {
-          this.sequence.bass = createBass(this.round);
-        }; break;
-      }
     }
     this.updateUI();
   }
@@ -435,9 +444,6 @@ export default class Game {
   }
 
   killEntity(entity) {
-
-    if (entity === this.player) this.setMode(GameMode.Reset);
-
     // Entity removal
 
     let index = Entity.entities.indexOf(entity);
@@ -461,15 +467,14 @@ export default class Game {
   }
 
   nextRound() {
+    this.round++;
     this.ctx.clean();
     this.spawnEntities(2);
     this.audio.reset();
-    this.round++;
     setTimeout(() => {
-      if (this.round % 2 == 0) {
-        this.sequence 
+      if (this.round % 2 === 0) {
+        this.sequence;
       } else {
-
       }
       this.audio.start(
         this.sequence,
