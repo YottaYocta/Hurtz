@@ -409,28 +409,28 @@ export default class Game {
       let enhancementA = new Entity(
         a,
         EntityType.randomEnchantment(),
-        this.ctx.createSprite(Resources.Eye),
+        this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map,
       );
       let enhancementB = new Entity(
         b,
         EntityType.randomEnchantment(),
-        this.ctx.createSprite(Resources.Eye),
+        this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map,
       );
       let enhancementC = new Entity(
         c,
         EntityType.randomEnchantment(),
-        this.ctx.createSprite(Resources.Eye),
+        this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map,
       );
       let enhancementD = new Entity(
         d,
         EntityType.randomEnchantment(),
-        this.ctx.createSprite(Resources.Eye),
+        this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map,
       );
@@ -485,6 +485,7 @@ export default class Game {
 
     if (entity.sprite) {
       entity.sprite.alpha = 0.3;
+      this.clearTint(entity);
       this.ctx.scheduleRemove(entity.sprite);
     }
 
