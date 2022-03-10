@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import { Instrument } from './sequence';
 
 export default class Audio {
   constructor(bpm) {
@@ -6,7 +7,7 @@ export default class Audio {
       .then((res) => {
         this.bpm = bpm;
         this.AMSynth = new Tone.AMSynth().toDestination();
-        this.MembraneSynth = new Tone.MembraneSynth().toDestination();
+        this.membraneSynth = new Tone.MembraneSynth().toDestination();
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
 
@@ -20,15 +21,33 @@ export default class Audio {
   start(sequence, callback, noteHandler) {
     this.loop = Tone.Transport.scheduleRepeat(
       (time) => {
-        let matrix = sequence.getCurrent();
-        if (matrix && matrix.bass) {
-          callback();
-          noteHandler(matrix.bass);
-          this.MembraneSynth.triggerAttackRelease(matrix.bass.note, "8n");
+        let timeEight = Tone.Time("0:0:2").toSeconds();
+        callback();
+
+        for (let i = 0; i < 8; i++) {
+        
+          let currentEighth = sequence.getCurrent(); 
+          
+          // BASS
+
+          if (currentEighth.bass && currentEighth.bass.note) {
+            switch (currentEighth.bass.instrument) {
+              case Instrument.BassBasic: {
+                this.membraneSynth.triggerAttackRelease(currentEighth.bass.note, '8n', time + i * timeEight);
+              }; break;
+              default: {
+                this.membraneSynth.triggerAttackRelease(currentEighth.bass.note, '8n', time + i * timeEight);
+                console.log('instrument does not exist');
+              };
+            }
+            Tone.Transport.scheduleOnce((time) => {
+              noteHandler(currentEighth.bass);
+            }, `+${timeEight * i}`);
+          }
         }
+
       },
       "1:0:0",
-      "1:0:0"
     );
     Tone.Transport.start();
   }

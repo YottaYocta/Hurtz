@@ -3,14 +3,17 @@ import Position from "./utils";
 
 export default class Entity {
   constructor(position, sprite, updateCallback, map, type) {
+
     this.position = new Position(position.x, position.y);
     this.target = new Position(0, 0);
     this.health = 10;
+    this.type = type;
+
     this.sprite = sprite;
     this.updateCallback = updateCallback;
+
     this.map = map;
     this.map.grid[position.y][position.x] = this;
-    this.type = type;
 
     Entity.entities.push(this);
   }
@@ -89,7 +92,7 @@ export default class Entity {
   }
 
   triggerUpdate() {
-    if (this.updateCallback) this.updateCallback();
+    if (this.updateCallback) this.updateCallback(this);
   }
 }
 
@@ -122,21 +125,21 @@ export class Arena {
 }
 
 export const EntityType = {
-  Player: 0,
-  Ghoul: 1,
-};
-
-export const Info = [
   // Player
-  {
+  Player: {
     name: "Player",
     description: "A headbanging mage. Casts Spells to the beat.",
   },
   // Ghoul
-  {
+  Ghoul: {
     name: "Ghoul",
     description: "Your typical undead (Will bite).",
   },
-];
+  // NewBass
+  NewBass: {
+    name: "Enchantment - New Bass",
+    description: "Replaces your current bassline with a new one.",
+  }
+};
 
 Entity.entities = [];

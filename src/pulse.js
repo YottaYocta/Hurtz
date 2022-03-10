@@ -1,6 +1,7 @@
 export const PulseType = {
   Axis: 1,
   Random: 2,
+  Cross: 3,
 };
 
 export default class PulseManager {

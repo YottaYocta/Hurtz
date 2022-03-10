@@ -21,8 +21,8 @@ svg {
 
 body {
   margin: auto;
-  height: min-content;
   width: min-content;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
