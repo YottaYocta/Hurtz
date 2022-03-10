@@ -450,9 +450,6 @@ export default class Game {
 
   entityChanged(entity) {
     if (entity.health <= 0) {
-      if (entity === this.player) {
-        this.setMode(GameMode.Reset);
-      }
       this.killEntity(entity);
     } else if (entity.health == 1) {
       switch (entity.type) {
@@ -477,6 +474,11 @@ export default class Game {
 
   killEntity(entity) {
     // Entity removal
+
+    if (entity === this.player) {
+      this.setMode(GameMode.Reset);
+      return;
+    }
 
     let index = Entity.entities.indexOf(entity);
     if (index > -1) {
