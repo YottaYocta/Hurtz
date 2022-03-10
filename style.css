@@ -38,7 +38,7 @@ body {
 .console {
   width: 90%;
   display: flex;
-  min-height: 3rem;
+  min-height: 30vh;
   flex-direction: column;
 }
 

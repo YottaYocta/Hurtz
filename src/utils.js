@@ -27,6 +27,10 @@ export default class Position {
   }
 }
 
+export function randInRange(a, b) {
+  return Math.floor(Math.random() * (a - b + 1)) + b;
+}
+
 export const Direction = {
   Up: 1,
   Down: 2,
