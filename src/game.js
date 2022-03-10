@@ -437,6 +437,9 @@ export default class Game {
     } else {
       for (let i = 0; i < this.round / 2 + 1; i++) {
         let pos = this.map.getEmpty();
+        while (pos.manhattanDist(this.player.position) < 5) {
+          pos = this.map.getEmpty();
+        }
         let enemy = new Entity(
           pos,
           EntityType.Ghoul,
@@ -505,7 +508,7 @@ export default class Game {
     this.round++;
     this.ctx.clean();
     this.audio.reset();
-    this.spawnEntities(2);
+    this.spawnEntities();
     setTimeout(() => {
       if (this.round % 2 === 1) {
         this.sequence;

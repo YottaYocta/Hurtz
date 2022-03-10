@@ -23,7 +23,7 @@ export default class Audio {
       let timeEight = Tone.Time("0:0:2").toSeconds();
       callback();
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 8; i++) {
         let currentEighth = sequence.getCurrent();
 
         // BASS
@@ -53,7 +53,7 @@ export default class Audio {
           }, `+${timeEight * i}`);
         }
       }
-    }, "0:2:0");
+    }, "1:0:0");
     Tone.Transport.start();
   }
 
