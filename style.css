@@ -9,7 +9,7 @@
   background: #3b324a;
   color: #5c6182;
   overflow: hidden;
-  font-size: 1.5vw;
+  font-size: 1vw;
   line-height: 2vw;
 }
 
@@ -43,6 +43,6 @@ body {
 }
 
 .console-element {
-  margin: 0.5rem;
+  min-height: 3vw;
   width: 90%;
 }

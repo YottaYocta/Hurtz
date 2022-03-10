@@ -213,27 +213,30 @@ export default class Game {
         break;
       case GameMode.Play:
         {
+          let playerMovement = '';
+
+          if (this.player.target.x > 0) {
+            playerMovement += `${Icons.Right} ${this.player.target.x}`;
+          } else if (this.player.target.x < 0) {
+            playerMovement += `${Icons.Left} ${Math.abs(
+              this.player.target.x
+            )}`;
+          }
+
+          playerMovement += " ";
+
+          if (this.player.target.y > 0) {
+            playerMovement += `${Icons.Down} ${this.player.target.y}`;
+          } else if (this.player.target.y < 0) {
+            playerMovement += `${Icons.Up} ${Math.abs(
+              this.player.target.y
+            )}`;
+          }
+
           let statusBar = "";
 
           statusBar += `${Icons.Heart} ${this.selectedEntity.health}`;
 
-          if (this.selectedEntity.target.x > 0) {
-            statusBar += `${Icons.Right} ${this.selectedEntity.target.x}`;
-          } else if (this.selectedEntity.target.x < 0) {
-            statusBar += `${Icons.Left} ${Math.abs(
-              this.selectedEntity.target.x
-            )}`;
-          }
-
-          statusBar += "\n";
-
-          if (this.selectedEntity.target.y > 0) {
-            statusBar += `${Icons.Down} ${this.selectedEntity.target.y}`;
-          } else if (this.selectedEntity.target.y < 0) {
-            statusBar += `${Icons.Up} ${Math.abs(
-              this.selectedEntity.target.y
-            )}`;
-          }
 
           let name = this.selectedEntity ? this.selectedEntity.type.name : "";
 
@@ -241,7 +244,7 @@ export default class Game {
             ? this.selectedEntity.type.description
             : "";
 
-          this.ctx.write([name, statusBar, description]);
+          this.ctx.write([playerMovement, name, statusBar, description]);
         }
         break;
       case GameMode.Reset:
@@ -402,10 +405,10 @@ export default class Game {
 
   spawnEntities() {
     if (this.round % 2 === 1) {
-      let a = new Position(0, 0);
-      let b = new Position(0, this.mapHeight - 1);
-      let c = new Position(this.mapWidth - 1, this.mapHeight - 1);
-      let d = new Position(this.mapWidth - 1, 0);
+      let a = new Position(3, 1); 
+      let b = new Position(3, this.mapHeight - 1 - 1);
+      let c = new Position(this.mapWidth - 1 - 3, this.mapHeight - 1 - 1);
+      let d = new Position(this.mapWidth - 1 - 3, 1);
       let enhancementA = new Entity(
         a,
         EntityType.randomEnchantment(),
@@ -520,7 +523,7 @@ export default class Game {
         this.handleNote.bind(this)
       );
     }, 1000);
-    this.player.position = new Position(randInRange(this.mapWidth / 2 - 3, this.mapWidth / 2 + 3), randInRange(this.mapHeight / 2 - 3, this.mapHeight / 2 + 3));
+    this.player.position = new Position(randInRange(this.mapWidth / 2 - 2, this.mapWidth / 2 + 2), randInRange(this.mapHeight / 2 - 2, this.mapHeight / 2 + 2));
   }
 }
 
