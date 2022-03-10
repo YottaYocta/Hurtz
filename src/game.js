@@ -502,8 +502,8 @@ export default class Game {
   nextRound() {
     this.round++;
     this.ctx.clean();
-    this.spawnEntities(2);
     this.audio.reset();
+    this.spawnEntities(2);
     setTimeout(() => {
       if (this.round % 2 === 1) {
         this.sequence;
