@@ -160,6 +160,12 @@ export class Arena {
 }
 
 export const EntityType = {
+  getSpawnable() {
+    return [this.Ghoul, this.Wendigo];
+  },
+  getSpawnableOnDepth(depth) {
+    return this.getSpawnable().filter(type => type.minDepth <= depth);
+  },
   Player: {
     name: "Player",
     description: "An amateur mage. Casts Spells to the beat.",
@@ -169,6 +175,18 @@ export const EntityType = {
     name: "Ghoul",
     description: "Your typical undead (Will bite).",
     health: 5,
+    minDepth: 0,
+  },
+  Wendigo: {
+    name: "Wendigo",
+    description: "Denizen of the early depths. Thick hide and thick head.",
+    health: 15,
+    minDepth: 5,
+  },
+  Abomination: {
+    name: "Abomination",
+    description: "Holder of eternal knowledge. Defeating it grants ascension.",
+    health: 1,
   },
   NewBass: {
     name: "Enchantment - New Bass",

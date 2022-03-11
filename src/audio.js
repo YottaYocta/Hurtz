@@ -6,9 +6,10 @@ export default class Audio {
     Tone.start()
       .then((res) => {
         this.bpm = bpm;
-        this.AMSynth = new Tone.AMSynth().toDestination();
-        this.limiter = new Tone.Limiter(-50).toDestination();
-        this.membraneSynth = new Tone.MembraneSynth().connect(this.limiter);
+        
+        this.AMSynth = new Tone.AMSynth().connect(new Tone.Volume(5).toDestination());
+        this.membraneSynth = new Tone.MembraneSynth().connect(new Tone.Volume(-10).toDestination());
+
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
 

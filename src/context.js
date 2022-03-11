@@ -4,6 +4,8 @@ import wizardUrl from "../assets/wizard.png";
 import eyeUrl from "../assets/eye.png";
 import ghoulUrl from "../assets/ghoul.png";
 import paperUrl from "../assets/paper.png";
+import wendigoUrl from "../assets/wendigo.png";
+import abominationUrl from "../assets/abomination.png";
 
 export default class Context {
   constructor(width, height) {
@@ -12,7 +14,7 @@ export default class Context {
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
     this.app = new PIXI.Application({ backgroundColor: 0x3b324a });
     this.app.autoDensity = true;
-    document.body.appendChild(this.app.view);
+   document.body.appendChild(this.app.view);
     this.app.view.classList.add("canvas");
 
     // output console
@@ -147,6 +149,8 @@ export const Resources = {
   Eye: eyeUrl,
   Ghoul: ghoulUrl,
   Paper: paperUrl,
+  Wendigo: wendigoUrl,
+  Abomination: abominationUrl,
 };
 
 export const Icons = {

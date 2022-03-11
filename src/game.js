@@ -19,6 +19,7 @@ export default class Game {
   constructor() {
     this.mapWidth = 16;
     this.mapHeight = 8;
+    this.winDepth = 10;
     this.map = new Arena(this.mapWidth, this.mapHeight);
     this.depth = 0;
     this.player = null;
@@ -270,6 +271,11 @@ export default class Game {
           this.ctx.write(["PRESS ANY KEY TO START NEW GAME"]);
         }
         break;
+    case GameMode.Ascend:
+        {
+          this.ctx.write(["ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM. PRESS ANY KEY TO PLAY AGAIN."]);
+        }
+        break;
     }
   }
 
@@ -295,6 +301,13 @@ export default class Game {
           this.updateUI();
         }
         break;
+    case GameMode.Ascend:
+        {
+          this.audio.stop();
+          this.updateUI();
+        }
+        break;
+
     }
   }
 
@@ -470,16 +483,41 @@ export default class Game {
         this.entityChanged.bind(this),
         this.map
       );
+    } else if (this.depth >= this.winDepth) {
+      let pos = this.map.getEmpty();
+      while (pos.manhattanDist(this.player.position) < 3) 
+        pos = this.map.getEmpty();
+      let newEntity = new Entity(
+        pos,
+        EntityType.Abomination,
+        this.ctx.createSprite(Resources.Abomination),
+        this.entityChanged.bind(this),
+        this.map
+      );
     } else {
       for (let i = 0; i < this.depth / 2 + 1; i++) {
         let pos = this.map.getEmpty();
         while (pos.manhattanDist(this.player.position) < 3) {
           pos = this.map.getEmpty();
         }
-        let enemy = new Entity(
+
+        let types = EntityType.getSpawnableOnDepth(this.depth);
+        let type = types[Math.floor(types.length * Math.random())]
+
+        let sprite = null;
+        switch(type) {
+          case EntityType.Ghoul: {
+            sprite = this.ctx.createSprite(Resources.Ghoul);
+          } break;
+          case EntityType.Wendigo: {
+            sprite = this.ctx.createSprite(Resources.Wendigo);
+          }; break;
+        }
+
+        let newEntity = new Entity(
           pos,
-          EntityType.Ghoul,
-          this.ctx.createSprite(Resources.Ghoul),
+          type,
+          sprite,
           this.entityChanged.bind(this),
           this.map
         );
@@ -541,6 +579,8 @@ export default class Game {
 
     if (entity === this.player) {
       this.setMode(GameMode.Reset);
+    } else if (entity.type === EntityType.Abomination) {
+      this.setMode(GameMode.Ascend);
     }
 
     let index = Entity.entities.indexOf(entity);
@@ -607,7 +647,7 @@ export default class Game {
 
 const GameMode = {
   Start: 1,
-  Shop: 2,
-  Play: 3,
-  Reset: 4,
+  Play: 2,
+  Reset: 3,
+  Ascend: 4,
 };
