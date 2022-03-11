@@ -110,6 +110,7 @@ export default class Game {
   // INPUT AND TURNS
 
   processKey(e) {
+    e.preventDefault();
     switch (this.mode) {
       case GameMode.Start:
         {
@@ -154,6 +155,11 @@ export default class Game {
                 this.nextFocus(false);
               }
               break;
+            case ".":
+              {
+                this.clearTarget(this.player);
+              }
+              break;
           }
         }
         break;
@@ -191,6 +197,10 @@ export default class Game {
         }
         break;
     }
+  }
+
+  clearTarget(entity) {
+    entity.target = new Position();
   }
 
   moveEntities() {
@@ -545,7 +555,7 @@ export default class Game {
     }
 
     this.map.grid[entity.position.y][entity.position.x] = null;
-    if ((this.selectedEntity = entity)) {
+    if (this.selectedEntity === entity) {
       this.nextFocus();
     }
 
@@ -557,7 +567,10 @@ export default class Game {
   nextRound() {
     this.round++;
     this.ctx.clean();
-    this.spawnEntities();
+
+    this.audio.onTime(() => {
+      this.spawnEntities();
+    }, 0.2);
 
     if (this.round % 2 === 1) {
       let newPlayerPosition = new Position(
@@ -570,6 +583,7 @@ export default class Game {
           Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1)
         )
       );
+
       while (
         !this.map.isValid(newPlayerPosition) &&
         this.map.isEmpty(newPlayerPosition)
@@ -587,6 +601,7 @@ export default class Game {
       }
       this.player.position = newPlayerPosition;
     }
+    this.clearTarget(this.player);
   }
 }
 

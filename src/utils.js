@@ -18,6 +18,11 @@ export default class Position {
     this.y = 0;
   }
 
+  floor() {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+  }
+
   manhattanDist(pos) {
     return Math.abs(this.x - pos.x) + Math.abs(this.y - pos.y);
   }
