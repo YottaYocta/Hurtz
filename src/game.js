@@ -35,7 +35,7 @@ export default class Game {
 
   reset() {
     this.ctx.reset();
-    this.audio.reset(Math.floor(Math.random() * 50) + 250);
+    this.audio.reset(Math.floor(Math.random() * 50) + 200, this.sequence, this.handlePulse.bind(this), this.handleNote.bind(this));
     this.pulseManager.reset();
 
     Entity.entities = [];
@@ -57,6 +57,7 @@ export default class Game {
 
     this.sequence.reset();
     this.sequence.bass = createBass(this.round);
+
   }
 
   // RENDERING
@@ -95,7 +96,6 @@ export default class Game {
   // INPUT AND TURNS
 
   processKey(e) {
-    e.preventDefault();
     switch (this.mode) {
       case GameMode.Start:
         {
@@ -146,7 +146,6 @@ export default class Game {
       case GameMode.Reset:
         {
           this.setMode(GameMode.Play);
-          this.audio.stop();
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
@@ -266,13 +265,9 @@ export default class Game {
       case GameMode.Play:
         {
           this.reset();
-          this.audio.start(
-            this.sequence,
-            this.handlePulse.bind(this),
-            this.handleNote.bind(this)
-          );
           this.nextRound();
           this.updateUI();
+          this.audio.start();
         }
         break;
       case GameMode.Reset:
@@ -362,13 +357,6 @@ export default class Game {
 
   createPulse(position, damage) {
     damage = damage || 1;
-    if (
-      position.x < 0 ||
-      position.x >= this.mapWidth ||
-      position.y < 0 ||
-      position.y >= this.mapHeight
-    )
-      return;
     let sprite = this.pulseManager.usePulse();
     if (!sprite) {
       sprite = this.ctx.createSprite(Resources.Eye, Colors.Orange);
@@ -440,7 +428,7 @@ export default class Game {
     } else {
       for (let i = 0; i < this.round / 2 + 1; i++) {
         let pos = this.map.getEmpty();
-        while (pos.manhattanDist(this.player.position) < 5) {
+        while (pos.manhattanDist(this.player.position) < 3) {
           pos = this.map.getEmpty();
         }
         let enemy = new Entity(
@@ -457,7 +445,7 @@ export default class Game {
   entityChanged(entity) {
     if (entity.health <= 0) {
       this.killEntity(entity);
-    } else if (entity.health == 1) {
+    } else if (this.round % 2 === 1 && entity.health !== EntityType.health) {
       switch (entity.type) {
         case EntityType.NewBass: {
           this.sequence.bass = createBass(this.round);
@@ -473,7 +461,7 @@ export default class Game {
   }
 
   damageAt(position, damage) {
-    if (this.map.grid[position.y][position.x] !== null) {
+    if (this.map.isValid(position) && !this.map.isEmpty(position)) {
       this.map.grid[position.y][position.x].damage(damage);
     }
   }
@@ -483,7 +471,6 @@ export default class Game {
 
     if (entity === this.player) {
       this.setMode(GameMode.Reset);
-      return;
     }
 
     let index = Entity.entities.indexOf(entity);
@@ -510,20 +497,22 @@ export default class Game {
   nextRound() {
     this.round++;
     this.ctx.clean();
-    this.audio.reset();
     this.spawnEntities();
-    setTimeout(() => {
-      if (this.round % 2 === 1) {
-        this.sequence;
-      } else {
-      }
-      this.audio.start(
-        this.sequence,
-        this.handlePulse.bind(this),
-        this.handleNote.bind(this)
+
+    if (this.round % 2 === 1) {
+      let newPlayerPosition = new Position(
+        randInRange(Math.max(this.mapWidth / 2 - 2, 0), Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)), 
+        randInRange(Math.max(0, this.mapHeight / 2 - 2), Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1))
       );
-    }, 1000);
-    this.player.position = new Position(randInRange(this.mapWidth / 2 - 2, this.mapWidth / 2 + 2), randInRange(this.mapHeight / 2 - 2, this.mapHeight / 2 + 2));
+      while (!this.map.isValid(newPlayerPosition) && this.map.isEmpty(newPlayerPosition)) {
+        newPlayerPosition = new Position(
+            randInRange(Math.max(this.mapWidth / 2 - 2, 0), Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)), 
+            randInRange(Math.max(0, this.mapHeight / 2 - 2), Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1))
+          );
+      }
+      this.player.position = newPlayerPosition;
+    }
+
   }
 }
 

@@ -18,7 +18,13 @@ export default class Audio {
       });
   }
 
-  start(sequence, callback, noteHandler) {
+  reset(bpm, sequence, callback, noteHandler) {
+
+    this.bpm = bpm;
+    if (this.loop !== undefined && this.loop !== null) {
+      Tone.Transport.clear(this.loop);
+    }
+
     this.loop = Tone.Transport.scheduleRepeat((time) => {
       let timeEight = Tone.Time("0:0:2").toSeconds();
       callback();
@@ -54,18 +60,17 @@ export default class Audio {
         }
       }
     }, "1:0:0");
+  }
+
+  start() {
     Tone.Transport.start();
+  }
+
+  pause() {
+    Tone.Transport.pause();
   }
 
   stop() {
     Tone.Transport.stop();
-  }
-
-  reset(bpm) {
-    this.bpm = bpm;
-    if (this.loop != undefined && this.loop != null) {
-      Tone.Transport.clear(this.loop);
-    }
-    Tone.Transport.cancel();
   }
 }

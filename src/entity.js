@@ -112,7 +112,10 @@ export class Arena {
     this.width = width;
     this.height = height;
     this.grid = new Array(height);
-    for (let i = 0; i < height; i++) this.grid[i] = new Array(width);
+    for (let i = 0; i < height; i++) {
+      this.grid[i] = new Array(width);
+    }
+    this.clear();
   }
 
   clear() {
@@ -132,6 +135,19 @@ export class Arena {
       );
     }
     return pos;
+  }
+
+  isValid(position) {
+    return (
+      position.x >= 0 && position.y >= 0 &&
+      position.x < this.width && position.y < this.height
+    ); 
+  }
+
+  isEmpty(position) {
+    return (
+      this.grid[position.y][position.x] === null
+    ); 
   }
 
   toString() {
