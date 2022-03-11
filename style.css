@@ -10,7 +10,7 @@
   color: #5c6182;
   overflow: hidden;
   font-size: 1vw;
-  line-height: 2vw;
+  line-height: 3vw;
 }
 
 svg {
@@ -43,6 +43,5 @@ body {
 }
 
 .console-element {
-  min-height: 3vw;
   width: 90%;
 }

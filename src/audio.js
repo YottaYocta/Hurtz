@@ -104,12 +104,12 @@ export default class Audio {
     Tone.Transport.stop();
   }
 
-  onTime(callback, seconds) {
+  schedule(callback, relativeTime) {
     if (Tone.Transport.state !== "started") callback();
     else {
       Tone.Transport.scheduleOnce((time) => {
         callback();
-      }, Tone.now() + seconds);
+      }, relativeTime);
     }
   }
 }
