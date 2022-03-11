@@ -55,7 +55,6 @@ export default class Audio {
                 "8n",
                 time + i * timeEight
               );
-              console.log("instrument does not exist");
             }
           }
           Tone.Transport.scheduleOnce((time) => {

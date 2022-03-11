@@ -3,6 +3,7 @@ export const PulseType = {
   Random: 2,
   Cross: 3,
   Suicide: 4,
+  RandomLine: 5,
 };
 
 export default class PulseManager {

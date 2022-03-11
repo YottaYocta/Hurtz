@@ -91,8 +91,8 @@ export const Instrument = {
 export default class Sequence {
   constructor() {
     this.currentNote = 0;
-    this.bass = [];
-    this.melody = [];
+    this._bass = [];
+    this._melody = [];
     this.chordProgression = Progressions.BasicMinor;
     this.startingPitch = Math.floor(Math.random() * 12);
   }
@@ -113,7 +113,6 @@ export default class Sequence {
   
   set bass(bass) {
     this._bass = bass;
-    this.currentNote = 0;
   }
 
   get melody() {
@@ -121,8 +120,9 @@ export default class Sequence {
   }
 
   set melody(melody) {
+    if (this._melody.length == 0) 
+      this.currentNote = 0;
     this._melody = melody;
-    this.currentNote = 0;
   }
 
   reset() {
@@ -141,10 +141,12 @@ export class Note {
       case Instrument.BassBasic:
         {
           this.range = 1;
+          this.damage = 2;
         }
         break;
       case Instrument.SynthBasic: {
-        this.range = 2; 
+        this.range = 3; 
+        this.damage = 5;
       }
       break;
     }
@@ -200,6 +202,5 @@ export function createMelody(startingPitch, progression) {
       }
     }
   }
-  console.log(melody);
   return melody;
 }
