@@ -7,7 +7,8 @@ export default class Audio {
       .then((res) => {
         this.bpm = bpm;
         this.AMSynth = new Tone.AMSynth().toDestination();
-        this.membraneSynth = new Tone.MembraneSynth().toDestination();
+        this.limiter = new Tone.Limiter(-50).toDestination();
+        this.membraneSynth = new Tone.MembraneSynth().connect(this.limiter);
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
 
@@ -19,8 +20,11 @@ export default class Audio {
   }
 
   reset(bpm, sequence, callback, noteHandler) {
-
     this.bpm = bpm;
+    this.restartLoop(sequence, callback, noteHandler);
+  }
+
+  restartLoop(sequence, callback, noteHandler) {
     if (this.loop !== undefined && this.loop !== null) {
       Tone.Transport.clear(this.loop);
     }
@@ -58,8 +62,36 @@ export default class Audio {
             noteHandler(currentEighth.bass);
           }, `+${timeEight * i}`);
         }
+
+        // MELODY
+
+        if (currentEighth.melody && currentEighth.melody.note) {
+          switch (currentEighth.melody.instrument) {
+            case Instrument.SynthBasic:
+              {
+                this.AMSynth.triggerAttackRelease(
+                  currentEighth.melody.note,
+                  "8n",
+                  time + i * timeEight
+                );
+              }
+              break;
+            default: {
+              this.membraneSynth.triggerAttackRelease(
+                currentEighth.melody.note,
+                "8n",
+                time + i * timeEight
+              );
+              console.log("instrument does not exist");
+            }
+          }
+          Tone.Transport.scheduleOnce((time) => {
+            noteHandler(currentEighth.melody);
+          }, `+${timeEight * i}`);
+        }
       }
     }, "1:0:0");
+
   }
 
   start() {

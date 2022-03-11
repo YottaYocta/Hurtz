@@ -3,7 +3,6 @@ import Position from "./utils";
 
 export default class Entity {
   constructor(position, type, sprite, updateCallback, map) {
-
     this.map = map;
     this.map.grid[position.y][position.x] = this;
 
@@ -19,7 +18,6 @@ export default class Entity {
   }
 
   get position() {
-
     return this._position;
   }
 
@@ -139,32 +137,32 @@ export class Arena {
 
   isValid(position) {
     return (
-      position.x >= 0 && position.y >= 0 &&
-      position.x < this.width && position.y < this.height
-    ); 
+      position.x >= 0 &&
+      position.y >= 0 &&
+      position.x < this.width &&
+      position.y < this.height
+    );
   }
 
   isEmpty(position) {
-    return (
-      this.grid[position.y][position.x] === null
-    ); 
+    return this.grid[position.y][position.x] === null;
   }
 
   toString() {
-    let output = '';
+    let output = "";
     for (let i = 0; i < this.height; i++) {
-      for (let j = 0; j < this.width; j++) output += (this.grid[i][j] ? 1 : 0) + ' ';
-      output += '\n';
+      for (let j = 0; j < this.width; j++)
+        output += (this.grid[i][j] ? 1 : 0) + " ";
+      output += "\n";
     }
     return output;
   }
 }
 
-
 export const EntityType = {
   Player: {
     name: "Player",
-    description: "A headbanging mage. Casts Spells to the beat.",
+    description: "An amateur mage. Casts Spells to the beat.",
     health: 10,
   },
   Ghoul: {
@@ -174,7 +172,8 @@ export const EntityType = {
   },
   NewBass: {
     name: "Enchantment - New Bass",
-    description: "Replaces your current bassline . Higher rounds give more notes.",
+    description:
+      "Replaces your current bassline. Higher rounds give more notes.",
     health: 3,
   },
   ExtendBassRange: {
@@ -182,14 +181,18 @@ export const EntityType = {
     description: "Extends the range of your current bass.",
     health: 3,
   },
-  getEnchantments: function() {
-    return [EntityType.NewBass, EntityType.ExtendBassRange];
+  NewMelody: {
+    name: "Enchantment - New Melody",
+    description: "Replaces your current melody. Higher rounds give more notes.", 
+    health: 3,
   },
-  randomEnchantment: function() {
+  getEnchantments: function () {
+    return [EntityType.NewBass, EntityType.ExtendBassRange, EntityType.NewMelody];
+  },
+  randomEnchantment: function () {
     let enchantments = this.getEnchantments();
-    return enchantments[Math.floor(Math.random() * enchantments.length)]; 
+    return enchantments[Math.floor(Math.random() * enchantments.length)];
   },
-
 };
 
 Entity.entities = [];

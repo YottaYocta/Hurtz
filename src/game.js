@@ -1,7 +1,7 @@
 import Context, { Resources, Icons, Colors } from "./context";
 import Audio from "./audio";
-import Sequence, { Instrument, createBass, extendRange } from "./sequence";
-import Entity, { Arena, EntityType} from "./entity";
+import Sequence, { Instrument, createBass, extendRange, createMelody } from "./sequence";
+import Entity, { Arena, EntityType } from "./entity";
 import Position, { Direction, randInRange } from "./utils";
 import PulseManager, { PulseType } from "./pulse";
 
@@ -35,7 +35,12 @@ export default class Game {
 
   reset() {
     this.ctx.reset();
-    this.audio.reset(Math.floor(Math.random() * 50) + 200, this.sequence, this.handlePulse.bind(this), this.handleNote.bind(this));
+    this.audio.reset(
+      Math.floor(Math.random() * 50) + 200,
+      this.sequence,
+      this.handlePulse.bind(this),
+      this.handleNote.bind(this)
+    );
     this.pulseManager.reset();
 
     Entity.entities = [];
@@ -50,14 +55,13 @@ export default class Game {
       EntityType.Player,
       this.ctx.createSprite(Resources.Wizard),
       this.entityChanged.bind(this),
-      this.map,
+      this.map
     );
 
     this.nextFocus();
 
     this.sequence.reset();
     this.sequence.bass = createBass(this.round);
-
   }
 
   // RENDERING
@@ -212,14 +216,12 @@ export default class Game {
         break;
       case GameMode.Play:
         {
-          let playerMovement = '';
+          let playerMovement = "";
 
           if (this.player.target.x > 0) {
             playerMovement += `${Icons.Right} ${this.player.target.x}`;
           } else if (this.player.target.x < 0) {
-            playerMovement += `${Icons.Left} ${Math.abs(
-              this.player.target.x
-            )}`;
+            playerMovement += `${Icons.Left} ${Math.abs(this.player.target.x)}`;
           }
 
           playerMovement += " ";
@@ -227,15 +229,12 @@ export default class Game {
           if (this.player.target.y > 0) {
             playerMovement += `${Icons.Down} ${this.player.target.y}`;
           } else if (this.player.target.y < 0) {
-            playerMovement += `${Icons.Up} ${Math.abs(
-              this.player.target.y
-            )}`;
+            playerMovement += `${Icons.Up} ${Math.abs(this.player.target.y)}`;
           }
 
           let statusBar = "";
 
           statusBar += `${Icons.Heart} ${this.selectedEntity.health}`;
-
 
           let name = this.selectedEntity ? this.selectedEntity.type.name : "";
 
@@ -292,7 +291,12 @@ export default class Game {
       switch (note.instrument) {
         case Instrument.BassBasic:
           {
-            this.spawnPulse(this.player.position, PulseType.Axis, note.range, 2);
+            this.spawnPulse(
+              this.player.position,
+              PulseType.Axis,
+              note.range,
+              2
+            );
           }
           break;
       }
@@ -321,37 +325,38 @@ export default class Game {
           }
         }
         break;
-      case PulseType.Cross: {
-        for (let i = 0; i < range; i++) {
-          this.createPulse(
-            { x: position.x - range + i, y: position.y - range + i },
-            damage
-          );
-          this.createPulse(
-            { x: position.x + range - i, y: position.y + range - i },
-            damage
-          );
-          this.createPulse(
-            { x: position.x - range + i, y: position.y + range - i },
-            damage
-          );
-          this.createPulse(
-            { x: position.x + range - i, y: position.y - range + i },
-            damage
-          );
+      case PulseType.Cross:
+        {
+          for (let i = 0; i < range; i++) {
+            this.createPulse(
+              { x: position.x - range + i, y: position.y - range + i },
+              damage
+            );
+            this.createPulse(
+              { x: position.x + range - i, y: position.y + range - i },
+              damage
+            );
+            this.createPulse(
+              { x: position.x - range + i, y: position.y + range - i },
+              damage
+            );
+            this.createPulse(
+              { x: position.x + range - i, y: position.y - range + i },
+              damage
+            );
+          }
         }
-      };
-      break;
-    case PulseType.Suicide: 
-      {
-        for (let i = position.x - range; i <= position.x + range; i++) {
-          this.createPulse({ x: i, y: position.y }, damage);
+        break;
+      case PulseType.Suicide:
+        {
+          for (let i = position.x - range; i <= position.x + range; i++) {
+            this.createPulse({ x: i, y: position.y }, damage);
+          }
+          for (let i = position.y - range; i <= position.y + range; i++) {
+            this.createPulse({ x: position.x, y: i }, damage);
+          }
         }
-        for (let i = position.y - range; i <= position.y + range; i++) {
-          this.createPulse({ x: position.x, y: i }, damage);
-        }
-      } 
-      break;
+        break;
     }
   }
 
@@ -371,9 +376,10 @@ export default class Game {
 
   enemyAI() {
     for (let entity of Entity.entities.filter(
-      (entity) => entity !== this.player && EntityType.getEnchantments().indexOf(entity.type) === -1
+      (entity) =>
+        entity !== this.player &&
+        EntityType.getEnchantments().indexOf(entity.type) === -1
     )) {
-
       if (entity.position.manhattanDist(this.player.position) <= 1) {
         this.damageAt(this.player.position, 3);
         continue;
@@ -393,7 +399,7 @@ export default class Game {
 
   spawnEntities() {
     if (this.round % 2 === 1) {
-      let a = new Position(3, 1); 
+      let a = new Position(3, 1);
       let b = new Position(3, this.mapHeight - 1 - 1);
       let c = new Position(this.mapWidth - 1 - 3, this.mapHeight - 1 - 1);
       let d = new Position(this.mapWidth - 1 - 3, 1);
@@ -402,28 +408,28 @@ export default class Game {
         EntityType.randomEnchantment(),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
-        this.map,
+        this.map
       );
       let enhancementB = new Entity(
         b,
         EntityType.randomEnchantment(),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
-        this.map,
+        this.map
       );
       let enhancementC = new Entity(
         c,
         EntityType.randomEnchantment(),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
-        this.map,
+        this.map
       );
       let enhancementD = new Entity(
         d,
         EntityType.randomEnchantment(),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
-        this.map,
+        this.map
       );
     } else {
       for (let i = 0; i < this.round / 2 + 1; i++) {
@@ -436,7 +442,7 @@ export default class Game {
           EntityType.Ghoul,
           this.ctx.createSprite(Resources.Ghoul),
           this.entityChanged.bind(this),
-          this.map,
+          this.map
         );
       }
     }
@@ -447,14 +453,37 @@ export default class Game {
       this.killEntity(entity);
     } else if (this.round % 2 === 1 && entity.health !== EntityType.health) {
       switch (entity.type) {
-        case EntityType.NewBass: {
-          this.sequence.bass = createBass(this.round);
-          this.spawnPulse(entity.position, PulseType.Suicide, this.mapWidth, 100);
-        } break;
-        case EntityType.ExtendBassRange: {
-          extendRange(this.sequence.bass, this.round)
-          this.spawnPulse(entity.position, PulseType.Suicide, this.mapWidth, 100);
-        } break;
+        case EntityType.NewBass:
+          {
+            this.sequence.bass = createBass(this.round);
+            this.spawnPulse(
+              entity.position,
+              PulseType.Suicide,
+              this.mapWidth,
+              100
+            );
+          }
+          break;
+        case EntityType.ExtendBassRange:
+          {
+            extendRange(this.sequence.bass, this.round);
+            this.spawnPulse(
+              entity.position,
+              PulseType.Suicide,
+              this.mapWidth,
+              100
+            );
+          }
+          break;
+        case EntityType.NewMelody: {
+          this.sequence.melody = createMelody();
+          this.spawnPulse(
+              entity.position,
+              PulseType.Suicide,
+              this.mapWidth,
+              100
+            );
+        }; break;
       }
     }
     this.updateUI();
@@ -501,18 +530,32 @@ export default class Game {
 
     if (this.round % 2 === 1) {
       let newPlayerPosition = new Position(
-        randInRange(Math.max(this.mapWidth / 2 - 2, 0), Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)), 
-        randInRange(Math.max(0, this.mapHeight / 2 - 2), Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1))
+        randInRange(
+          Math.max(this.mapWidth / 2 - 2, 0),
+          Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)
+        ),
+        randInRange(
+          Math.max(0, this.mapHeight / 2 - 2),
+          Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1)
+        )
       );
-      while (!this.map.isValid(newPlayerPosition) && this.map.isEmpty(newPlayerPosition)) {
+      while (
+        !this.map.isValid(newPlayerPosition) &&
+        this.map.isEmpty(newPlayerPosition)
+      ) {
         newPlayerPosition = new Position(
-            randInRange(Math.max(this.mapWidth / 2 - 2, 0), Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)), 
-            randInRange(Math.max(0, this.mapHeight / 2 - 2), Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1))
-          );
+          randInRange(
+            Math.max(this.mapWidth / 2 - 2, 0),
+            Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)
+          ),
+          randInRange(
+            Math.max(0, this.mapHeight / 2 - 2),
+            Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1)
+          )
+        );
       }
       this.player.position = newPlayerPosition;
     }
-
   }
 }
 

@@ -3,7 +3,7 @@ import Position from "./utils";
 import wizardUrl from "../assets/wizard.png";
 import eyeUrl from "../assets/eye.png";
 import ghoulUrl from "../assets/ghoul.png";
-import paperUrl from '../assets/paper.png';
+import paperUrl from "../assets/paper.png";
 
 export default class Context {
   constructor(width, height) {
