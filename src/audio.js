@@ -8,7 +8,7 @@ export default class Audio {
         this.bpm = bpm;
         
         this.AMSynth = new Tone.AMSynth().connect(new Tone.Volume(5).toDestination());
-        this.membraneSynth = new Tone.MembraneSynth().connect(new Tone.Volume(-10).toDestination());
+        this.membraneSynth = new Tone.MembraneSynth().connect(new Tone.Volume(-5).toDestination());
 
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
