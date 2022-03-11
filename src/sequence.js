@@ -110,7 +110,7 @@ export default class Sequence {
   get bass() {
     return this._bass;
   }
-  
+
   set bass(bass) {
     this._bass = bass;
   }
@@ -120,8 +120,7 @@ export default class Sequence {
   }
 
   set melody(melody) {
-    if (this._melody.length == 0) 
-      this.currentNote = 0;
+    if (this._melody.length == 0) this.currentNote = 0;
     this._melody = melody;
   }
 
@@ -144,11 +143,12 @@ export class Note {
           this.damage = 2;
         }
         break;
-      case Instrument.SynthBasic: {
-        this.range = 3; 
-        this.damage = 5;
-      }
-      break;
+      case Instrument.SynthBasic:
+        {
+          this.range = 3;
+          this.damage = 5;
+        }
+        break;
     }
   }
 }
@@ -196,7 +196,12 @@ export function createMelody(startingPitch, progression) {
     let randomPattern = Patterns[Math.floor(Math.random() * Patterns.length)];
     for (let j = 0; j < MeasureLength; j++) {
       if (j % 2 == 0) {
-        melody.push(new Note(MelodyPitches[startingPitch + chord[randomPattern[j / 2]]], Instrument.SynthBasic));
+        melody.push(
+          new Note(
+            MelodyPitches[startingPitch + chord[randomPattern[j / 2]]],
+            Instrument.SynthBasic
+          )
+        );
       } else {
         melody.push(new Note(null, Instrument.SynthBasic));
       }

@@ -183,11 +183,15 @@ export const EntityType = {
   },
   NewMelody: {
     name: "Enchantment - New Melody",
-    description: "Replaces your current melody. Higher rounds give more notes.", 
+    description: "Replaces your current melody. Higher rounds give more notes.",
     health: 3,
   },
   getEnchantments: function () {
-    return [EntityType.NewBass, EntityType.ExtendBassRange, EntityType.NewMelody];
+    return [
+      EntityType.NewBass,
+      EntityType.ExtendBassRange,
+      EntityType.NewMelody,
+    ];
   },
   randomEnchantment: function () {
     let enchantments = this.getEnchantments();

@@ -90,7 +90,6 @@ export default class Audio {
         }
       }
     }, "1:0:0");
-
   }
 
   start() {

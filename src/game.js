@@ -1,8 +1,18 @@
 import Context, { Resources, Icons, Colors } from "./context";
 import Audio from "./audio";
-import Sequence, { Instrument, createBass, extendRange, createMelody } from "./sequence";
+import Sequence, {
+  Instrument,
+  createBass,
+  extendRange,
+  createMelody,
+} from "./sequence";
 import Entity, { Arena, EntityType } from "./entity";
-import Position, { Direction, randInRange, bresenham, randInUnitRange } from "./utils";
+import Position, {
+  Direction,
+  randInRange,
+  bresenham,
+  randInUnitRange,
+} from "./utils";
 import PulseManager, { PulseType } from "./pulse";
 
 export default class Game {
@@ -295,19 +305,18 @@ export default class Game {
               this.player.position,
               PulseType.Axis,
               note.range,
-              note.damage,
+              note.damage
             );
           }
           break;
-        case Instrument.SynthBasic:
-          {
-            this.spawnPulse(
-              this.player.position,
-              PulseType.RandomLine,
-              note.range,
-              note.damage,
-            );
-          }
+        case Instrument.SynthBasic: {
+          this.spawnPulse(
+            this.player.position,
+            PulseType.RandomLine,
+            note.range,
+            note.damage
+          );
+        }
       }
     }
   }
@@ -366,16 +375,17 @@ export default class Game {
           }
         }
         break;
-      case PulseType.RandomLine: {
-        let end = randInUnitRange(range - 1, range);
-        end.x = Math.round(end.x + position.x);
-        end.y = Math.round(end.y + position.y);
-        let results = bresenham(position, end);
-        for (let target of results) {
-          if (!target.equals(position))
-            this.createPulse(target, damage);
+      case PulseType.RandomLine:
+        {
+          let end = randInUnitRange(range - 1, range);
+          end.x = Math.round(end.x + position.x);
+          end.y = Math.round(end.y + position.y);
+          let results = bresenham(position, end);
+          for (let target of results) {
+            if (!target.equals(position)) this.createPulse(target, damage);
+          }
         }
-      } break;
+        break;
     }
   }
 
@@ -494,15 +504,17 @@ export default class Game {
             );
           }
           break;
-        case EntityType.NewMelody: {
-          this.sequence.melody = createMelody();
-          this.spawnPulse(
+        case EntityType.NewMelody:
+          {
+            this.sequence.melody = createMelody(this.sequence.startingPitch);
+            this.spawnPulse(
               entity.position,
               PulseType.Suicide,
               this.mapWidth,
               100
             );
-        }; break;
+          }
+          break;
       }
     }
     this.updateUI();
