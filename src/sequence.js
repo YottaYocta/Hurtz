@@ -83,9 +83,15 @@ const MelodyPitches = [
   "C7",
 ];
 
+// Used in audio and game
+
 export const Instrument = {
-  BassBasic: 1,
-  SynthBasic: 2,
+  BassBasic: {
+    damage: 2,
+  },
+  SynthBasic: {
+    damage: 5,
+  },
 };
 
 export default class Sequence {
@@ -140,13 +146,11 @@ export class Note {
       case Instrument.BassBasic:
         {
           this.range = 1;
-          this.damage = 2;
         }
         break;
       case Instrument.SynthBasic:
         {
           this.range = 3;
-          this.damage = 5;
         }
         break;
     }

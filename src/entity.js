@@ -159,6 +159,8 @@ export class Arena {
   }
 }
 
+// Used in game 
+
 export const EntityType = {
   getSpawnable() {
     return [this.Ghoul, this.Wendigo];

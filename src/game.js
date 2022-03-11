@@ -321,26 +321,23 @@ export default class Game {
     if (this.depth % 2 === 1) {
       this.spawnPulse(this.player.position, PulseType.Cross, 1, 2);
     } else {
+      let pulseType = null;
       switch (note.instrument) {
         case Instrument.BassBasic:
           {
-            this.spawnPulse(
-              this.player.position,
-              PulseType.Axis,
-              note.range,
-              note.damage
-            );
+            pulseType = PulseType.Axis;
           }
           break;
         case Instrument.SynthBasic: {
-          this.spawnPulse(
-            this.player.position,
-            PulseType.RandomLine,
-            note.range,
-            note.damage
-          );
+          pulseType = PulseType.RandomLine; 
         }
       }
+      this.spawnPulse(
+        this.player.position,
+        pulseType,
+        note.range,
+        note.damage
+      );
     }
   }
 
@@ -529,40 +526,40 @@ export default class Game {
     if (entity.health <= 0) {
       this.killEntity(entity);
     } else if (this.depth % 2 === 1 && entity.health !== EntityType.health) {
+      let spawned = false;
       switch (entity.type) {
+        
+        // BASS ENCHANTMENTS
+
         case EntityType.NewBass:
           {
             this.sequence.bass = createBass(this.depth);
-            this.spawnPulse(
-              entity.position,
-              PulseType.Suicide,
-              this.mapWidth,
-              100
-            );
+            spawned = true;
           }
           break;
         case EntityType.ExtendBassRange:
           {
             extendRange(this.sequence.bass, this.depth);
-            this.spawnPulse(
-              entity.position,
-              PulseType.Suicide,
-              this.mapWidth,
-              100
-            );
+            spawned = true;
           }
           break;
+
+        // MELODY ENCHANTMENTS
+
         case EntityType.NewMelody:
           {
             this.sequence.melody = createMelody(this.sequence.startingPitch);
-            this.spawnPulse(
-              entity.position,
-              PulseType.Suicide,
-              this.mapWidth,
-              100
-            );
+            spawned = true;
           }
           break;
+      }
+      if (spawned) {
+        this.spawnPulse(
+            entity.position,
+            PulseType.Suicide,
+            this.mapWidth,
+            100
+          );
       }
     }
     this.updateUI();
