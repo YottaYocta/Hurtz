@@ -159,9 +159,7 @@ export class Arena {
   }
 }
 
-
 export const EntityType = {
-  
   Player: {
     name: "Player",
     description: "An amateur mage. Casts Spells to the beat.",
@@ -169,7 +167,7 @@ export const EntityType = {
   },
   Bomb: {
     name: "Bomb",
-    description: "Heavily damages nearby units in a cross shape.",
+    description: "Heavily damages units in a cross shape.",
     health: 3,
   },
 
@@ -180,25 +178,48 @@ export const EntityType = {
     description: "Your typical undead (Will bite).",
     health: 5,
     minDepth: 0,
+    maxDepth: 14,
   },
   Wendigo: {
     name: "Wendigo",
     description: "Denizen of the early depths. Thick hide and thick head.",
     health: 10,
-    minDepth: 5,
+    minDepth: 6,
+    maxDepth: 16,
+  },
+  Beholder: {
+    name: "Beholder",
+    description: "A very large eye. Has 20/20 vision.",
+    health: 30,
+    minDepth: 10,
+    maxDepth: 20,
+  },
+  Wraith: {
+    name: "Wraith",
+    description:
+      "Prowler of the darkest corners. Will take both your wallet and your life.",
+    health: 60,
+    minDepth: 14,
+    maxDepth: 26,
   },
   Abomination: {
     name: "Abomination",
     description: "Holder of eternal knowledge. Defeating it grants ascension.",
-    health: 50,
+    health: 200,
     minDepth: 10000,
   },
 
   getSpawnable() {
-    return [this.Ghoul, this.Wendigo, this.Abomination];
+    return [
+      this.Ghoul,
+      this.Wendigo,
+      this.Beholder,
+      this.Wraith,
+      this.Abomination,
+    ];
   },
   getSpawnableOnDepth(depth) {
-    return this.getSpawnable().filter(type => type.minDepth <= depth);
+    return this.getSpawnable().filter((type) => type.minDepth <= depth);
   },
 
   // ENCHANTMENTS - register in Game.entityChanged
@@ -217,37 +238,54 @@ export const EntityType = {
     minDepth: 0,
     maxDepth: 26,
   },
+  IncreaseBassDamage: {
+    name: "Enchantment - Increase Bass Damage",
+    description: "Increases the damage of your current bass.",
+    health: 3,
+    minDepth: 0,
+    maxDepth: 26,
+  },
+  IncreaseMelodyDamage: {
+    name: "Enchantment - Increase Melody Damage",
+    description: "Increases the damage of your current melody.",
+    health: 3,
+    minDepth: 0,
+    maxDepth: 26,
+  },
 
   // BASS
 
   BasicBass: {
     name: "Basic Bass",
     description:
-      "Replaces your current bassline. Commonly Wielded by DJs.",
+      "Replaces your current bassline. Purchasing at deeper depths gives a higher trigger rate. Commonly Wielded by DJs.",
     health: 3,
     minDepth: 0,
-    maxDepth: 1,
+    maxDepth: 5,
   },
-  
+
   // MELODY
 
   BasicMelody: {
     name: "Basic Melody",
-    description: "Replaces your current melody. Powerful enough to annoy any human.",
+    description:
+      "Replaces your current melody. Powerful enough to annoy any human.",
     health: 3,
     minDepth: 0,
-    maxDepth: 1,
+    maxDepth: 3,
   },
   CursedMelody: {
     name: "Cursed Melody",
-    description: "Replaces your current melody. Curses enemies and deals massive damage.",
+    description:
+      "Replaces your current melody. It scales quickly and deals massive damage at the expense of having a slower trigger rate.",
     health: 3,
     minDepth: 3,
     maxDepth: 9,
   },
   ThunderSong: {
     name: "Song of Thunder",
-    description: "Replaces your current (pun intended) melody. Does more damage with the power of a thousand AAA batteries.",
+    description:
+      "Replaces your current (pun intended) melody. Does more damage with the power of a thousand AAA batteries. Very fast trigger rate at the expense of slow damage and range scaling.",
     health: 3,
     minDepth: 5,
     maxDepth: 9,
@@ -256,6 +294,8 @@ export const EntityType = {
     return [
       EntityType.ExtendBassRange,
       EntityType.ExtendMelodyRange,
+      EntityType.IncreaseBassDamage,
+      EntityType.IncreaseMelodyDamage,
       EntityType.BasicBass,
       EntityType.BasicMelody,
       EntityType.CursedMelody,
@@ -263,7 +303,10 @@ export const EntityType = {
     ];
   },
   randomEnchantment(depth) {
-    let enchantments = this.getEnchantments().filter(enchantment => enchantment.minDepth <= depth & enchantment.maxDepth >= depth);
+    let enchantments = this.getEnchantments().filter(
+      (enchantment) =>
+        enchantment.minDepth <= depth && enchantment.maxDepth >= depth
+    );
     return enchantments[Math.floor(Math.random() * enchantments.length)];
   },
 };

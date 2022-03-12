@@ -86,25 +86,28 @@ const MelodyPitches = [
 // Register in Note, Audio, and handleNote
 
 export const Instrument = {
-
   // BASS
 
   BassBasic: {
     damage: 3,
+    range: 1,
   },
 
   // SYNTH
 
   SynthBasic: {
-    damage: 6,
+    damage: 1,
+    range: 2,
     activationThreshold: 0.2,
   },
   SynthDuo: {
-    damage: 24,
+    damage: 15,
+    range: 5,
     activationThreshold: 0,
   },
   SynthSaw: {
-    damage: 12,
+    damage: 2,
+    range: 3,
     activationThreshold: 0.9,
   },
 };
@@ -157,28 +160,8 @@ export class Note {
   constructor(note, instrument) {
     this.note = note;
     this.instrument = instrument;
-    switch (instrument) {
-      case Instrument.BassBasic:
-        {
-          this.range = 1;
-        }
-        break;
-      case Instrument.SynthBasic:
-        {
-          this.range = 3;
-        }
-        break;
-      case Instrument.SynthSaw:
-        {
-          this.range = 5;
-        }
-        break;
-      case Instrument.SynthDuo: 
-        {
-          this.range = 10;
-        }
-        break;
-    }
+    this.range = instrument.range;
+    this.damage = instrument.damage;
   }
 }
 // Enchantments
@@ -187,7 +170,6 @@ export function createBass(strength, instrument) {
   let bass = [];
   if (!strength) {
     for (let i = 0; i < MeasureLength * 4; i++) {
-
       // generation is done by eigth notes
 
       let note = null;
@@ -212,7 +194,15 @@ export function createBass(strength, instrument) {
 export function extendRange(notes) {
   for (let note of notes) {
     if (note.note) {
-      note.range += 1;
+      note.range += note.instrument.range;
+    }
+  }
+}
+
+export function increaseDamage(notes) {
+  for (let note of notes) {
+    if (note.note) {
+      note.damage += note.instrument.damage;
     }
   }
 }

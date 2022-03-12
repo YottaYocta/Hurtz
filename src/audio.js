@@ -6,15 +6,21 @@ export default class Audio {
     Tone.start()
       .then((res) => {
         this.bpm = bpm;
-        
-        this.AMSynth = new Tone.AMSynth().connect(new Tone.Volume(8).toDestination());
-        this.membraneSynth = new Tone.MembraneSynth().connect(new Tone.Volume(-5).toDestination());
+
+        this.AMSynth = new Tone.AMSynth().connect(
+          new Tone.Volume(8).toDestination()
+        );
+        this.membraneSynth = new Tone.MembraneSynth().connect(
+          new Tone.Volume(-2).toDestination()
+        );
         this.sawSynth = new Tone.Synth({
           oscillator: {
-            type: 'sawtooth',
-          }
+            type: "sawtooth",
+          },
         }).toDestination();
-        this.duoSynth = new Tone.DuoSynth().connect(new Tone.Volume(-5).toDestination());
+        this.duoSynth = new Tone.DuoSynth().connect(
+          new Tone.Volume(-10).toDestination()
+        );
 
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
@@ -72,7 +78,7 @@ export default class Audio {
         // MELODY
 
         if (currentEighth.melody && currentEighth.melody.note) {
-          let noteLength = Tone.Time("8n").toSeconds() * 3 / 4;
+          let noteLength = (Tone.Time("8n").toSeconds() * 3) / 4;
           switch (currentEighth.melody.instrument) {
             case Instrument.SynthBasic:
               {
@@ -92,7 +98,7 @@ export default class Audio {
                 );
               }
               break;
-            case Instrument.SynthDuo: 
+            case Instrument.SynthDuo:
               {
                 this.duoSynth.triggerAttackRelease(
                   currentEighth.melody.note,

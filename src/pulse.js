@@ -16,7 +16,9 @@ export default class PulseManager {
   }
 
   usePulse(color) {
-    return this.pulses.find((sprite) => sprite.alpha < 0.01 && sprite.tint === color);
+    return this.pulses.find(
+      (sprite) => sprite.alpha < 0.01 && sprite.tint === color
+    );
   }
 
   updatePulses() {

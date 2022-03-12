@@ -4,6 +4,7 @@ import Sequence, {
   Instrument,
   createBass,
   extendRange,
+  increaseDamage,
   createMelody,
 } from "./sequence";
 import Entity, { Arena, EntityType } from "./entity";
@@ -19,7 +20,7 @@ export default class Game {
   constructor() {
     this.mapWidth = 16;
     this.mapHeight = 8;
-    this.winDepth = 10;
+    this.winDepth = 26;
     this.map = new Arena(this.mapWidth, this.mapHeight);
     this.depth = 0;
     this.player = null;
@@ -172,7 +173,6 @@ export default class Game {
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
-
     }
   }
 
@@ -274,10 +274,12 @@ export default class Game {
           this.ctx.write(["PRESS ANY KEY TO START NEW GAME"]);
         }
         break;
-    case GameMode.Ascend:
+      case GameMode.Ascend:
         {
           this.clearTarget(this.player);
-          this.ctx.write(["ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM. PRESS ANY KEY TO PLAY AGAIN."]);
+          this.ctx.write([
+            "ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM. PRESS ANY KEY TO PLAY AGAIN.",
+          ]);
         }
         break;
     }
@@ -305,12 +307,11 @@ export default class Game {
           this.updateUI();
         }
         break;
-    case GameMode.Ascend:
+      case GameMode.Ascend:
         {
           this.updateUI();
         }
         break;
-
     }
   }
 
@@ -326,8 +327,7 @@ export default class Game {
     } else {
       let pulseType = null;
       switch (note.instrument) {
-
-        // BASS 
+        // BASS
 
         case Instrument.BassBasic:
           {
@@ -338,18 +338,12 @@ export default class Game {
         // SYNTH
 
         case Instrument.SynthDuo:
-        case Instrument.SynthSaw: 
+        case Instrument.SynthSaw:
         case Instrument.SynthBasic: {
-          pulseType = PulseType.RandomLine; 
+          pulseType = PulseType.RandomLine;
         }
-
       }
-      this.spawnPulse(
-        this.player.position,
-        pulseType,
-        note.range,
-        note.instrument.damage,
-      );
+      this.spawnPulse(this.player.position, pulseType, note.range, note.damage);
     }
   }
 
@@ -433,7 +427,7 @@ export default class Game {
       sprite.tint = Colors.Orange;
     } else if (damage > 10) {
       sprite.tint = Colors.Red;
-    } else if (damage > 5) { 
+    } else if (damage > 5) {
       sprite.tint = Colors.Mint;
     } else {
       sprite.tint = Colors.Teal;
@@ -470,61 +464,63 @@ export default class Game {
 
   spawnEntities() {
     if (this.depth % 2 === 1) {
-      let a = new Position(4, 1);
-      let b = new Position(4, this.mapHeight - 1 - 1);
-      let c = new Position(this.mapWidth - 1 - 4, this.mapHeight - 1 - 1);
-      let d = new Position(this.mapWidth - 1 - 4, 1);
-      let enhancementA = new Entity(
-        a,
-        EntityType.randomEnchantment(this.depth),
-        this.ctx.createSprite(Resources.Paper),
-        this.entityChanged.bind(this),
-        this.map
-      );
-      let enhancementB = new Entity(
-        b,
-        EntityType.randomEnchantment(this.depth),
-        this.ctx.createSprite(Resources.Paper),
-        this.entityChanged.bind(this),
-        this.map
-      );
-      let enhancementC = new Entity(
-        c,
-        EntityType.randomEnchantment(this.depth),
-        this.ctx.createSprite(Resources.Paper),
-        this.entityChanged.bind(this),
-        this.map
-      );
-      let enhancementD = new Entity(
-        d,
-        EntityType.randomEnchantment(this.depth),
-        this.ctx.createSprite(Resources.Paper),
-        this.entityChanged.bind(this),
-        this.map
-      );
+      for (let i = 1; i <= 2; i++) {
+        let a = new Position(3 * i, 0);
+        let b = new Position(3 * i, this.mapHeight - 1);
+        let c = new Position(this.mapWidth - 1 - 3 * i, this.mapHeight - 1);
+        let d = new Position(this.mapWidth - 1 - 3 * i, 0);
+        let enhancementA = new Entity(
+          a,
+          EntityType.randomEnchantment(this.depth),
+          this.ctx.createSprite(Resources.Paper),
+          this.entityChanged.bind(this),
+          this.map
+        );
+        let enhancementB = new Entity(
+          b,
+          EntityType.randomEnchantment(this.depth),
+          this.ctx.createSprite(Resources.Paper),
+          this.entityChanged.bind(this),
+          this.map
+        );
+        let enhancementC = new Entity(
+          c,
+          EntityType.randomEnchantment(this.depth),
+          this.ctx.createSprite(Resources.Paper),
+          this.entityChanged.bind(this),
+          this.map
+        );
+        let enhancementD = new Entity(
+          d,
+          EntityType.randomEnchantment(this.depth),
+          this.ctx.createSprite(Resources.Paper),
+          this.entityChanged.bind(this),
+          this.map
+        );
+      }
       let bombA = new Entity(
-        new Position(a.x - 4, a.y),
+        new Position(0, 0),
         EntityType.Bomb,
         this.ctx.createSprite(Resources.Bomb),
         this.entityChanged.bind(this),
         this.map
       );
       let bombB = new Entity(
-        new Position(b.x - 4, b.y),
+        new Position(0, this.mapHeight - 1),
         EntityType.Bomb,
         this.ctx.createSprite(Resources.Bomb),
         this.entityChanged.bind(this),
         this.map
       );
       let bombC = new Entity(
-        new Position(c.x + 4, c.y),
+        new Position(this.mapWidth - 1, this.mapHeight - 1),
         EntityType.Bomb,
         this.ctx.createSprite(Resources.Bomb),
         this.entityChanged.bind(this),
         this.map
       );
       let bombD = new Entity(
-        new Position(d.x + 4, d.y),
+        new Position(this.mapWidth - 1, 0),
         EntityType.Bomb,
         this.ctx.createSprite(Resources.Bomb),
         this.entityChanged.bind(this),
@@ -532,7 +528,7 @@ export default class Game {
       );
     } else if (this.depth >= this.winDepth) {
       let pos = this.map.getEmpty();
-      while (pos.manhattanDist(this.player.position) < 3) 
+      while (pos.manhattanDist(this.player.position) < 3)
         pos = this.map.getEmpty();
       let newEntity = new Entity(
         pos,
@@ -549,16 +545,30 @@ export default class Game {
         }
 
         let types = EntityType.getSpawnableOnDepth(this.depth);
-        let type = types[Math.floor(types.length * Math.random())]
+        let type = types[Math.floor(types.length * Math.random())];
 
         let sprite = null;
-        switch(type) {
-          case EntityType.Ghoul: {
-            sprite = this.ctx.createSprite(Resources.Ghoul);
-          } break;
-          case EntityType.Wendigo: {
-            sprite = this.ctx.createSprite(Resources.Wendigo);
-          }; break;
+        switch (type) {
+          case EntityType.Ghoul:
+            {
+              sprite = this.ctx.createSprite(Resources.Ghoul);
+            }
+            break;
+          case EntityType.Wendigo:
+            {
+              sprite = this.ctx.createSprite(Resources.Wendigo);
+            }
+            break;
+          case EntityType.Beholder:
+            {
+              sprite = this.ctx.createSprite(Resources.Beholder);
+            }
+            break;
+          case EntityType.Wraith:
+            {
+              sprite = this.ctx.createSprite(Resources.Wraith);
+            }
+            break;
         }
 
         let newEntity = new Entity(
@@ -578,16 +588,10 @@ export default class Game {
       this.killEntity(entity);
     } else if (this.depth % 2 === 1 && entity.health !== entity.type.health) {
       if (entity.type === EntityType.Bomb) {
-        this.spawnPulse(
-            entity.position,
-            PulseType.Suicide,
-            this.mapWidth,
-            100
-        );
+        this.spawnPulse(entity.position, PulseType.Suicide, this.mapWidth, 100);
       } else {
         let spawned = false;
         switch (entity.type) {
-          
           // ENCHANTMENTS
 
           case EntityType.ExtendBassRange:
@@ -602,9 +606,20 @@ export default class Game {
               spawned = true;
             }
             break;
+          case EntityType.IncreaseBassDamage:
+            {
+              increaseDamage(this.sequence.bass);
+              spawned = true;
+            }
+            break;
+          case EntityType.IncreaseMelodyDamage:
+            {
+              increaseDamage(this.sequence.melody);
+              spawned = true;
+            }
+            break;
 
-
-          // BASS 
+          // BASS
 
           case EntityType.BasicBass:
             {
@@ -613,31 +628,46 @@ export default class Game {
             }
             break;
 
-          // MELODY 
+          // MELODY
 
           case EntityType.BasicMelody:
             {
-              this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthBasic);
+              this.sequence.melody = createMelody(
+                this.sequence.pitch,
+                this.sequence.progression,
+                Instrument.SynthBasic
+              );
               spawned = true;
             }
             break;
-          case EntityType.ThunderSong: {
-            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthSaw);
-            spawned = true;
-          } break;
-          case EntityType.CursedMelody: {
-            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthDuo);
-            spawned = true;
-          } break;
-
+          case EntityType.ThunderSong:
+            {
+              this.sequence.melody = createMelody(
+                this.sequence.pitch,
+                this.sequence.progression,
+                Instrument.SynthSaw
+              );
+              spawned = true;
+            }
+            break;
+          case EntityType.CursedMelody:
+            {
+              this.sequence.melody = createMelody(
+                this.sequence.pitch,
+                this.sequence.progression,
+                Instrument.SynthDuo
+              );
+              spawned = true;
+            }
+            break;
         }
         if (spawned) {
           this.spawnPulse(
-              entity.position,
-              PulseType.Suicide,
-              this.mapWidth,
-              100
-            );
+            entity.position,
+            PulseType.Suicide,
+            this.mapWidth,
+            100
+          );
         }
       }
     }
@@ -654,6 +684,7 @@ export default class Game {
     // Entity removal
 
     if (entity === this.player) {
+      console.log("lead");
       this.setMode(GameMode.Reset);
       return;
     } else if (entity.type === EntityType.Abomination) {
@@ -688,17 +719,17 @@ export default class Game {
 
     this.audio.schedule(() => {
       this.spawnEntities();
-    }, '+8n');
+    }, "+8n");
 
     if (this.depth % 2 === 1) {
       let newPlayerPosition = new Position(
         randInRange(
-          Math.max(this.mapWidth / 2 - 2, 0),
-          Math.min(this.mapWidth / 2 + 2, this.mapWidth - 1)
+          Math.max(this.mapWidth / 2 - 1, 0),
+          Math.min(this.mapWidth / 2 + 1, this.mapWidth - 1)
         ),
         randInRange(
-          Math.max(0, this.mapHeight / 2 - 2),
-          Math.min(this.mapHeight / 2 + 2, this.mapHeight - 1)
+          Math.max(0, this.mapHeight / 2 - 1),
+          Math.min(this.mapHeight / 2 + 1, this.mapHeight - 1)
         )
       );
 
