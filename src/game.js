@@ -429,6 +429,16 @@ export default class Game {
       this.pulseManager.add(sprite);
     }
     sprite.alpha = 1;
+    if (damage > 20) {
+      sprite.tint = Colors.Orange;
+    } else if (damage > 10) {
+      sprite.tint = Colors.Red;
+    } else if (damage > 5) { 
+      sprite.tint = Colors.Mint;
+    } else {
+      sprite.tint = Colors.Teal;
+    }
+
     this.ctx.setSprite(position, sprite);
     this.damageAt(position, damage);
   }
