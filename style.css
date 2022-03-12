@@ -45,3 +45,13 @@ body {
 .console-element {
   width: 90%;
 }
+
+.fade {
+  animation: fade 5s forwards;
+}
+
+@keyframes fade {
+  0% { opacity: 1 }
+  75% { opacity: 1 }
+  100% { opacity: 0 }
+}

@@ -81,6 +81,7 @@ export default class Game {
   tick() {
     switch (this.mode) {
       case GameMode.Ascend:
+      case GameMode.Tutorial:
       case GameMode.Play:
         {
           this.updateScene();
@@ -118,7 +119,10 @@ export default class Game {
       case GameMode.Start:
         {
           window.requestAnimationFrame(this.tick.bind(this));
-          this.setMode(GameMode.Play);
+          if (e.key === "T" || e.key == "t") this.setMode(GameMode.Tutorial);
+          else if (e.key === " ") {
+            this.setMode(GameMode.Play);
+          }
         }
         break;
       case GameMode.Play:
@@ -166,6 +170,62 @@ export default class Game {
           }
         }
         break;
+      case GameMode.Tutorial:
+        {
+          switch (e.key) {
+            case "ArrowLeft":
+            case "h":
+              {
+                this.scheduleMove(this.player, Direction.Left);
+              }
+              break;
+            case "ArrowDown":
+            case "j":
+              {
+                this.scheduleMove(this.player, Direction.Down);
+              }
+              break;
+            case "ArrowUp":
+            case "k":
+              {
+                this.scheduleMove(this.player, Direction.Up);
+              }
+              break;
+            case "ArrowRight":
+            case "l":
+              {
+                this.scheduleMove(this.player, Direction.Right);
+              }
+              break;
+            case "q":
+              {
+                this.nextFocus(true);
+              }
+              break;
+            case "Q":
+              {
+                this.nextFocus(false);
+              }
+              break;
+            case ".":
+              {
+                this.clearTarget(this.player);
+              }
+              break;
+            case " ":
+              {
+                if (this.mode.next()) {
+                  if (this.mode.currentIndex() === 2) this.nextDepth();
+                  this.updateUI();
+                } else {
+                  this.setMode(GameMode.Play);
+                }
+              }
+              break;
+          }
+        }
+        break;
+
       case GameMode.Ascend:
       case GameMode.Reset:
         {
@@ -235,7 +295,9 @@ export default class Game {
     switch (this.mode) {
       case GameMode.Start:
         {
-          this.ctx.write(["PRESS ANY KEY TO BEGIN"]);
+          this.ctx.write([
+            "PRESS T [t/T] FOR A TUTORIAL AND SPACE [ ] TO BEGIN",
+          ]);
         }
         break;
       case GameMode.Play:
@@ -278,8 +340,32 @@ export default class Game {
         {
           this.clearTarget(this.player);
           this.ctx.write([
-            "ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM. PRESS ANY KEY TO PLAY AGAIN.",
+            "ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM - CONGRATULATIONS. PRESS ANY KEY TO PLAY AGAIN.",
           ]);
+        }
+        break;
+      case GameMode.Tutorial:
+        {
+          let playerStatus = "TUTORIAL ";
+          let next = "SPACE [ ] FOR NEXT SECTION";
+
+          if (this.player.target.x > 0) {
+            playerStatus += `  ${Icons.Right} ${this.player.target.x}`;
+          } else if (this.player.target.x < 0) {
+            playerStatus += `  ${Icons.Left} ${Math.abs(this.player.target.x)}`;
+          }
+
+          playerStatus += " ";
+
+          if (this.player.target.y > 0) {
+            playerStatus += `${Icons.Down} ${this.player.target.y}`;
+          } else if (this.player.target.y < 0) {
+            playerStatus += `${Icons.Up} ${Math.abs(this.player.target.y)}`;
+          }
+
+          let info = GameMode.Tutorial.current();
+          if (info) this.ctx.write([playerStatus, info, next]);
+          else this.setMode(GameMode.Reset);
         }
         break;
     }
@@ -312,6 +398,11 @@ export default class Game {
           this.updateUI();
         }
         break;
+      case GameMode.Tutorial: {
+        this.reset();
+        this.audio.start();
+        this.updateUI();
+      }
     }
   }
 
@@ -583,7 +674,6 @@ export default class Game {
   }
 
   entityChanged(entity) {
-    if (this.mode === GameMode.Ascend) return;
     if (entity.health <= 0) {
       this.killEntity(entity);
     } else if (this.depth % 2 === 1 && entity.health !== entity.type.health) {
@@ -708,7 +798,10 @@ export default class Game {
       this.nextFocus();
     }
 
-    if ((Entity.entities.length === 1) & (Entity.entities[0] === this.player)) {
+    if (
+      (Entity.entities.length === 1) & (Entity.entities[0] === this.player) &&
+      this.mode !== GameMode.Tutorial
+    ) {
       this.nextDepth();
     }
   }
@@ -759,4 +852,44 @@ const GameMode = {
   Play: 2,
   Reset: 3,
   Ascend: 4,
+  Tutorial: {
+    currentSlide: 0,
+
+    slides: [
+      `Welcome, player. This will be a brief introduction on how this game works.
+      First, the movement; to move, you can either use the arrow keys or VIM keys (hjkl).`,
+
+      `Try holding down your choice of movement key. As you can see,
+      the movement system in the game is based on the pulse of the music. When playing,
+      you will be able to see how many steps are left by looking at the area right
+      underneath the main display; there will be arrows indicating whether you still have
+      tiles to travel. You can cancel this movement by pressing period [.].
+      `,
+      `
+      You can view/inspect different entities, be it enchantments or creatures,
+      with Q [q/Q]. To apply enchantments, you need to attack the one you want to use.
+      This promptly kills all adjacent ones, so choose wisely! If you want none of the options, just attack the bomb.
+      More will be explained in the next section.
+      `,
+      `
+      As hinted at before, you must kill or destroy all entities in a level or room before progressing (even a 'shop' room).
+      Your goal is to reach the 26th floor and defeat the 'final boss'. 
+      Best of luck! 
+      `,
+    ],
+    next() {
+      this.currentSlide++;
+      if (this.currentSlide >= this.slides.length) {
+        this.currentSlide = 0;
+        return false;
+      }
+      return true;
+    },
+    current() {
+      return this.slides[this.currentSlide];
+    },
+    currentIndex() {
+      return this.currentSlide;
+    },
+  },
 };
