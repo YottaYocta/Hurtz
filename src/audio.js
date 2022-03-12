@@ -7,8 +7,14 @@ export default class Audio {
       .then((res) => {
         this.bpm = bpm;
         
-        this.AMSynth = new Tone.AMSynth().connect(new Tone.Volume(7).toDestination());
+        this.AMSynth = new Tone.AMSynth().connect(new Tone.Volume(8).toDestination());
         this.membraneSynth = new Tone.MembraneSynth().connect(new Tone.Volume(-5).toDestination());
+        this.sawSynth = new Tone.Synth({
+          oscillator: {
+            type: 'sawtooth',
+          }
+        }).toDestination();
+        this.duoSynth = new Tone.DuoSynth().connect(new Tone.Volume(-5).toDestination());
 
         this.loop = null;
         Tone.Transport.bpm.value = this.bpm;
@@ -66,23 +72,42 @@ export default class Audio {
         // MELODY
 
         if (currentEighth.melody && currentEighth.melody.note) {
+          let noteLength = Tone.Time("8n").toSeconds() * 3 / 4;
           switch (currentEighth.melody.instrument) {
             case Instrument.SynthBasic:
               {
                 this.AMSynth.triggerAttackRelease(
                   currentEighth.melody.note,
-                  "8n",
+                  noteLength,
                   time + i * timeEight
                 );
               }
               break;
+            case Instrument.SynthSaw:
+              {
+                this.sawSynth.triggerAttackRelease(
+                  currentEighth.melody.note,
+                  noteLength,
+                  time + i * timeEight
+                );
+              }
+              break;
+            case Instrument.SynthDuo: 
+              {
+                this.duoSynth.triggerAttackRelease(
+                  currentEighth.melody.note,
+                  noteLength,
+                  time + i * timeEight
+                );
+              }
+              break;
+
             default: {
               this.membraneSynth.triggerAttackRelease(
                 currentEighth.melody.note,
-                "8n",
+                noteLength,
                 time + i * timeEight
               );
-              console.log("instrument does not exist");
             }
           }
           Tone.Transport.scheduleOnce((time) => {

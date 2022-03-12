@@ -83,14 +83,29 @@ const MelodyPitches = [
   "C8",
 ];
 
-// Used in audio and game
+// Register in Note, Audio, and handleNote
 
 export const Instrument = {
+
+  // BASS
+
   BassBasic: {
-    damage: 2,
+    damage: 3,
   },
+
+  // SYNTH
+
   SynthBasic: {
-    damage: 5,
+    damage: 6,
+    activationThreshold: 0.2,
+  },
+  SynthDuo: {
+    damage: 24,
+    activationThreshold: 0,
+  },
+  SynthSaw: {
+    damage: 12,
+    activationThreshold: 0.9,
   },
 };
 
@@ -99,8 +114,8 @@ export default class Sequence {
     this.currentNote = 0;
     this._bass = [];
     this._melody = [];
-    this.chordProgression = Progressions.BasicMinor;
-    this.startingPitch = Math.floor(Math.random() * 12);
+    this.progression = Progressions.BasicMinor;
+    this.pitch = Math.floor(Math.random() * 12);
   }
 
   getCurrent() {
@@ -126,15 +141,15 @@ export default class Sequence {
   }
 
   set melody(melody) {
-    if (this._melody.length == 0) this.currentNote = 0;
+    if (this._melody.length === 0) this.currentNote = 0;
     this._melody = melody;
   }
 
   reset() {
     this.bass = [];
     this.melody = [];
-    this.chordProgression = Progressions.BasicMinor;
-    this.startingPitch = Math.floor(Math.random() * 12);
+    this.progression = Progressions.BasicMinor;
+    this.pitch = Math.floor(Math.random() * 12);
   }
 }
 
@@ -153,20 +168,31 @@ export class Note {
           this.range = 3;
         }
         break;
+      case Instrument.SynthSaw:
+        {
+          this.range = 5;
+        }
+        break;
+      case Instrument.SynthDuo: 
+        {
+          this.range = 10;
+        }
+        break;
     }
   }
 }
 // Enchantments
 
-export function createBass(strength) {
+export function createBass(strength, instrument) {
   let bass = [];
   if (!strength) {
     for (let i = 0; i < MeasureLength * 4; i++) {
+
       // generation is done by eigth notes
 
       let note = null;
       if (i % 4 === 0) note = "C1";
-      bass.push(new Note(note, Instrument.BassBasic));
+      bass.push(new Note(note, instrument));
     }
     return bass;
   }
@@ -178,36 +204,35 @@ export function createBass(strength) {
     if (i % 2 === 0) active += 0.3;
     let note = null;
     if (active > Math.random() * 2) note = "C1";
-    bass.push(new Note(note, Instrument.BassBasic));
+    bass.push(new Note(note, instrument));
   }
   return bass;
 }
 
-export function extendRange(bass, strength) {
-  let increase = Math.ceil(strength / 2);
-  for (let note of bass) {
+export function extendRange(notes) {
+  for (let note of notes) {
     if (note.note) {
-      note.range += increase;
+      note.range += 1;
     }
   }
 }
 
-export function createMelody(startingPitch, progression) {
-  startingPitch = startingPitch || 0;
+export function createMelody(pitch, progression, instrument) {
+  pitch = pitch || 0;
   progression = progression || Progressions.BasicMinor;
   let melody = [];
   for (let chord of progression) {
     let randomPattern = Patterns[Math.floor(Math.random() * Patterns.length)];
     for (let j = 0; j < MeasureLength; j++) {
-      if (j % 2 == 0) {
+      if (j % 2 === 0 || Math.random() < instrument.activationThreshold) {
         melody.push(
           new Note(
-            MelodyPitches[startingPitch + chord[randomPattern[j / 2]]],
-            Instrument.SynthBasic
+            MelodyPitches[pitch + chord[randomPattern[Math.floor(j / 2)]]],
+            instrument
           )
         );
       } else {
-        melody.push(new Note(null, Instrument.SynthBasic));
+        melody.push(new Note(null, instrument));
       }
     }
   }

@@ -159,20 +159,17 @@ export class Arena {
   }
 }
 
-// Used in game 
 
 export const EntityType = {
-  getSpawnable() {
-    return [this.Ghoul, this.Wendigo];
-  },
-  getSpawnableOnDepth(depth) {
-    return this.getSpawnable().filter(type => type.minDepth <= depth);
-  },
+  
   Player: {
     name: "Player",
     description: "An amateur mage. Casts Spells to the beat.",
     health: 10,
   },
+
+  // SPAWNABLES - register in Game.spawnEnemies
+
   Ghoul: {
     name: "Ghoul",
     description: "Your typical undead (Will bite).",
@@ -182,39 +179,85 @@ export const EntityType = {
   Wendigo: {
     name: "Wendigo",
     description: "Denizen of the early depths. Thick hide and thick head.",
-    health: 15,
+    health: 10,
     minDepth: 5,
   },
   Abomination: {
     name: "Abomination",
     description: "Holder of eternal knowledge. Defeating it grants ascension.",
-    health: 1,
+    health: 50,
   },
-  NewBass: {
-    name: "Enchantment - New Bass",
-    description:
-      "Replaces your current bassline. Higher rounds give more notes.",
-    health: 3,
+
+  getSpawnable() {
+    return [this.Ghoul, this.Wendigo];
   },
+  getSpawnableOnDepth(depth) {
+    return this.getSpawnable().filter(type => type.minDepth <= depth);
+  },
+
+  // ENCHANTMENTS - register in Game.entityChanged
+
   ExtendBassRange: {
     name: "Enchantment - Extend Bass Range",
     description: "Extends the range of your current bass.",
     health: 3,
+    minDepth: 0,
+    maxDepth: 26,
   },
-  NewMelody: {
-    name: "Enchantment - New Melody",
-    description: "Replaces your current melody. Higher rounds give more notes.",
+  ExtendMelodyRange: {
+    name: "Enchantment - Extend Melody Range",
+    description: "Extends the range of your current melody.",
     health: 3,
+    minDepth: 0,
+    maxDepth: 26,
   },
-  getEnchantments: function () {
+
+  // BASS
+
+  BasicBass: {
+    name: "Basic Bass",
+    description:
+      "Replaces your current bassline. Commonly Wielded by DJs.",
+    health: 3,
+    minDepth: 0,
+    maxDepth: 1,
+  },
+  
+  // MELODY
+
+  BasicMelody: {
+    name: "Basic Melody",
+    description: "Replaces your current melody. Powerful enough to annoy any human.",
+    health: 3,
+    minDepth: 0,
+    maxDepth: 1,
+  },
+  CursedMelody: {
+    name: "Cursed Melody",
+    description: "Replaces your current melody. Curses enemies and deals massive damage.",
+    health: 3,
+    minDepth: 3,
+    maxDepth: 9,
+  },
+  ThunderSong: {
+    name: "Song of Thunder",
+    description: "Replaces your current (pun intended) melody. Does more damage with the power of a thousand AAA batteries.",
+    health: 3,
+    minDepth: 5,
+    maxDepth: 9,
+  },
+  getEnchantments() {
     return [
-      EntityType.NewBass,
       EntityType.ExtendBassRange,
-      EntityType.NewMelody,
+      EntityType.ExtendMelodyRange,
+      EntityType.BasicBass,
+      EntityType.BasicMelody,
+      EntityType.CursedMelody,
+      EntityType.ThunderSong,
     ];
   },
-  randomEnchantment: function () {
-    let enchantments = this.getEnchantments();
+  randomEnchantment(depth) {
+    let enchantments = this.getEnchantments().filter(enchantment => enchantment.minDepth <= depth & enchantment.maxDepth >= depth);
     return enchantments[Math.floor(Math.random() * enchantments.length)];
   },
 };

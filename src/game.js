@@ -72,13 +72,14 @@ export default class Game {
     this.nextFocus();
 
     this.sequence.reset();
-    this.sequence.bass = createBass(this.depth);
+    this.sequence.bass = createBass(this.depth, Instrument.BassBasic);
   }
 
   // RENDERING
 
   tick() {
     switch (this.mode) {
+      case GameMode.Ascend:
       case GameMode.Play:
         {
           this.updateScene();
@@ -164,12 +165,14 @@ export default class Game {
           }
         }
         break;
+      case GameMode.Ascend:
       case GameMode.Reset:
         {
           this.setMode(GameMode.Play);
           window.requestAnimationFrame(this.tick.bind(this));
         }
         break;
+
     }
   }
 
@@ -273,6 +276,7 @@ export default class Game {
         break;
     case GameMode.Ascend:
         {
+          this.clearTarget(this.player);
           this.ctx.write(["ABOMINATION EXTERMINATED. YOU HAVE ASCENDED TO THE ETERNAL REALM. PRESS ANY KEY TO PLAY AGAIN."]);
         }
         break;
@@ -290,9 +294,9 @@ export default class Game {
       case GameMode.Play:
         {
           this.reset();
+          this.audio.start();
           this.nextDepth();
           this.updateUI();
-          this.audio.start();
         }
         break;
       case GameMode.Reset:
@@ -303,7 +307,6 @@ export default class Game {
         break;
     case GameMode.Ascend:
         {
-          this.audio.stop();
           this.updateUI();
         }
         break;
@@ -323,20 +326,29 @@ export default class Game {
     } else {
       let pulseType = null;
       switch (note.instrument) {
+
+        // BASS 
+
         case Instrument.BassBasic:
           {
             pulseType = PulseType.Axis;
           }
           break;
+
+        // SYNTH
+
+        case Instrument.SynthDuo:
+        case Instrument.SynthSaw: 
         case Instrument.SynthBasic: {
           pulseType = PulseType.RandomLine; 
         }
+
       }
       this.spawnPulse(
         this.player.position,
         pulseType,
         note.range,
-        note.damage
+        note.instrument.damage,
       );
     }
   }
@@ -454,28 +466,28 @@ export default class Game {
       let d = new Position(this.mapWidth - 1 - 3, 1);
       let enhancementA = new Entity(
         a,
-        EntityType.randomEnchantment(),
+        EntityType.randomEnchantment(this.depth),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map
       );
       let enhancementB = new Entity(
         b,
-        EntityType.randomEnchantment(),
+        EntityType.randomEnchantment(this.depth),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map
       );
       let enhancementC = new Entity(
         c,
-        EntityType.randomEnchantment(),
+        EntityType.randomEnchantment(this.depth),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map
       );
       let enhancementD = new Entity(
         d,
-        EntityType.randomEnchantment(),
+        EntityType.randomEnchantment(this.depth),
         this.ctx.createSprite(Resources.Paper),
         this.entityChanged.bind(this),
         this.map
@@ -523,35 +535,55 @@ export default class Game {
   }
 
   entityChanged(entity) {
+    if (this.mode === GameMode.Ascend) return;
     if (entity.health <= 0) {
       this.killEntity(entity);
     } else if (this.depth % 2 === 1 && entity.health !== EntityType.health) {
       let spawned = false;
       switch (entity.type) {
         
-        // BASS ENCHANTMENTS
+        // ENCHANTMENTS
 
-        case EntityType.NewBass:
-          {
-            this.sequence.bass = createBass(this.depth);
-            spawned = true;
-          }
-          break;
         case EntityType.ExtendBassRange:
           {
-            extendRange(this.sequence.bass, this.depth);
+            extendRange(this.sequence.bass);
             spawned = true;
           }
           break;
-
-        // MELODY ENCHANTMENTS
-
-        case EntityType.NewMelody:
+        case EntityType.ExtendMelodyRange:
           {
-            this.sequence.melody = createMelody(this.sequence.startingPitch);
+            extendRange(this.sequence.melody);
             spawned = true;
           }
           break;
+
+
+        // BASS 
+
+        case EntityType.BasicBass:
+          {
+            this.sequence.bass = createBass(this.depth, Instrument.BassBasic);
+            spawned = true;
+          }
+          break;
+
+        // MELODY 
+
+        case EntityType.BasicMelody:
+          {
+            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthBasic);
+            spawned = true;
+          }
+          break;
+        case EntityType.ThunderSong: {
+          this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthSaw);
+          spawned = true;
+        } break;
+        case EntityType.CursedMelody: {
+          this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthDuo);
+          spawned = true;
+        } break;
+
       }
       if (spawned) {
         this.spawnPulse(
@@ -576,8 +608,10 @@ export default class Game {
 
     if (entity === this.player) {
       this.setMode(GameMode.Reset);
+      return;
     } else if (entity.type === EntityType.Abomination) {
       this.setMode(GameMode.Ascend);
+      return;
     }
 
     let index = Entity.entities.indexOf(entity);
