@@ -167,6 +167,11 @@ export const EntityType = {
     description: "An amateur mage. Casts Spells to the beat.",
     health: 10,
   },
+  Bomb: {
+    name: "Bomb",
+    description: "Heavily damages nearby units in a cross shape.",
+    health: 3,
+  },
 
   // SPAWNABLES - register in Game.spawnEnemies
 
@@ -186,10 +191,11 @@ export const EntityType = {
     name: "Abomination",
     description: "Holder of eternal knowledge. Defeating it grants ascension.",
     health: 50,
+    minDepth: 10000,
   },
 
   getSpawnable() {
-    return [this.Ghoul, this.Wendigo];
+    return [this.Ghoul, this.Wendigo, this.Abomination];
   },
   getSpawnableOnDepth(depth) {
     return this.getSpawnable().filter(type => type.minDepth <= depth);

@@ -449,7 +449,7 @@ export default class Game {
     for (let entity of Entity.entities.filter(
       (entity) =>
         entity !== this.player &&
-        EntityType.getEnchantments().indexOf(entity.type) === -1
+        EntityType.getSpawnable().indexOf(entity.type) !== -1
     )) {
       if (entity.position.manhattanDist(this.player.position) <= 1) {
         this.damageAt(this.player.position, 3);
@@ -470,10 +470,10 @@ export default class Game {
 
   spawnEntities() {
     if (this.depth % 2 === 1) {
-      let a = new Position(3, 1);
-      let b = new Position(3, this.mapHeight - 1 - 1);
-      let c = new Position(this.mapWidth - 1 - 3, this.mapHeight - 1 - 1);
-      let d = new Position(this.mapWidth - 1 - 3, 1);
+      let a = new Position(4, 1);
+      let b = new Position(4, this.mapHeight - 1 - 1);
+      let c = new Position(this.mapWidth - 1 - 4, this.mapHeight - 1 - 1);
+      let d = new Position(this.mapWidth - 1 - 4, 1);
       let enhancementA = new Entity(
         a,
         EntityType.randomEnchantment(this.depth),
@@ -499,6 +499,34 @@ export default class Game {
         d,
         EntityType.randomEnchantment(this.depth),
         this.ctx.createSprite(Resources.Paper),
+        this.entityChanged.bind(this),
+        this.map
+      );
+      let bombA = new Entity(
+        new Position(a.x - 4, a.y),
+        EntityType.Bomb,
+        this.ctx.createSprite(Resources.Bomb),
+        this.entityChanged.bind(this),
+        this.map
+      );
+      let bombB = new Entity(
+        new Position(b.x - 4, b.y),
+        EntityType.Bomb,
+        this.ctx.createSprite(Resources.Bomb),
+        this.entityChanged.bind(this),
+        this.map
+      );
+      let bombC = new Entity(
+        new Position(c.x + 4, c.y),
+        EntityType.Bomb,
+        this.ctx.createSprite(Resources.Bomb),
+        this.entityChanged.bind(this),
+        this.map
+      );
+      let bombD = new Entity(
+        new Position(d.x + 4, d.y),
+        EntityType.Bomb,
+        this.ctx.createSprite(Resources.Bomb),
         this.entityChanged.bind(this),
         this.map
       );
@@ -548,60 +576,69 @@ export default class Game {
     if (this.mode === GameMode.Ascend) return;
     if (entity.health <= 0) {
       this.killEntity(entity);
-    } else if (this.depth % 2 === 1 && entity.health !== EntityType.health) {
-      let spawned = false;
-      switch (entity.type) {
-        
-        // ENCHANTMENTS
-
-        case EntityType.ExtendBassRange:
-          {
-            extendRange(this.sequence.bass);
-            spawned = true;
-          }
-          break;
-        case EntityType.ExtendMelodyRange:
-          {
-            extendRange(this.sequence.melody);
-            spawned = true;
-          }
-          break;
-
-
-        // BASS 
-
-        case EntityType.BasicBass:
-          {
-            this.sequence.bass = createBass(this.depth, Instrument.BassBasic);
-            spawned = true;
-          }
-          break;
-
-        // MELODY 
-
-        case EntityType.BasicMelody:
-          {
-            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthBasic);
-            spawned = true;
-          }
-          break;
-        case EntityType.ThunderSong: {
-          this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthSaw);
-          spawned = true;
-        } break;
-        case EntityType.CursedMelody: {
-          this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthDuo);
-          spawned = true;
-        } break;
-
-      }
-      if (spawned) {
+    } else if (this.depth % 2 === 1 && entity.health !== entity.type.health) {
+      if (entity.type === EntityType.Bomb) {
         this.spawnPulse(
             entity.position,
             PulseType.Suicide,
             this.mapWidth,
             100
-          );
+        );
+      } else {
+        let spawned = false;
+        switch (entity.type) {
+          
+          // ENCHANTMENTS
+
+          case EntityType.ExtendBassRange:
+            {
+              extendRange(this.sequence.bass);
+              spawned = true;
+            }
+            break;
+          case EntityType.ExtendMelodyRange:
+            {
+              extendRange(this.sequence.melody);
+              spawned = true;
+            }
+            break;
+
+
+          // BASS 
+
+          case EntityType.BasicBass:
+            {
+              this.sequence.bass = createBass(this.depth, Instrument.BassBasic);
+              spawned = true;
+            }
+            break;
+
+          // MELODY 
+
+          case EntityType.BasicMelody:
+            {
+              this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthBasic);
+              spawned = true;
+            }
+            break;
+          case EntityType.ThunderSong: {
+            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthSaw);
+            spawned = true;
+          } break;
+          case EntityType.CursedMelody: {
+            this.sequence.melody = createMelody(this.sequence.pitch, this.sequence.progression, Instrument.SynthDuo);
+            spawned = true;
+          } break;
+
+        }
+        if (spawned) {
+          this.spawnPulse(
+              entity.position,
+              PulseType.Suicide,
+              this.mapWidth,
+              100
+            );
+        }
       }
     }
     this.updateUI();

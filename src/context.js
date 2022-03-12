@@ -6,6 +6,7 @@ import ghoulUrl from "../assets/ghoul.png";
 import paperUrl from "../assets/paper.png";
 import wendigoUrl from "../assets/wendigo.png";
 import abominationUrl from "../assets/abomination.png";
+import bombUrl from "../assets/bomb.png";
 
 export default class Context {
   constructor(width, height) {
@@ -148,9 +149,10 @@ export const Resources = {
   Wizard: wizardUrl,
   Eye: eyeUrl,
   Ghoul: ghoulUrl,
-  Paper: paperUrl,
   Wendigo: wendigoUrl,
   Abomination: abominationUrl,
+  Paper: paperUrl,
+  Bomb: bombUrl,
 };
 
 export const Icons = {
