@@ -2,10 +2,10 @@ const MeasureLength = 8;
 
 const Progressions = {
   BasicMinor: [
+    [0, 3, 7, 12],
     [12, 15, 19, 24],
+    [0, 3, 7, 12],
     [12, 15, 19, 24],
-    [24, 27, 31, 26],
-    [24, 27, 31, 26],
     [5, 8, 12, 17],
     [17, 20, 24, 29],
     [7, 11, 14, 17],
@@ -21,18 +21,6 @@ const Patterns = [
 ];
 
 const MelodyPitches = [
-  "C2",
-  "C#2",
-  "D2",
-  "D#2",
-  "E2",
-  "F2",
-  "F#2",
-  "G2",
-  "G#2",
-  "A2",
-  "A#2",
-  "B2",
   "C3",
   "C#3",
   "D3",
@@ -70,6 +58,7 @@ const MelodyPitches = [
   "A#5",
   "B5",
   "C6",
+  "C#6",
   "D6",
   "D#6",
   "E6",
@@ -81,6 +70,17 @@ const MelodyPitches = [
   "A#6",
   "B6",
   "C7",
+  "D7",
+  "D#7",
+  "E7",
+  "F7",
+  "F#7",
+  "G7",
+  "G#7",
+  "A7",
+  "A#7",
+  "B7",
+  "C8",
 ];
 
 // Used in audio and game
