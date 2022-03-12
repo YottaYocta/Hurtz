@@ -531,6 +531,7 @@ export default class Game {
   // ENEMIES AND COMBAT
 
   enemyAI() {
+    if (this.depth >= this.winDepth && this.mode == GameMode.Ascend) return;
     for (let entity of Entity.entities.filter(
       (entity) =>
         entity !== this.player &&
@@ -674,6 +675,7 @@ export default class Game {
   }
 
   entityChanged(entity) {
+    if (this.mode == GameMode.Ascend) return;
     if (entity.health <= 0) {
       this.killEntity(entity);
     } else if (this.depth % 2 === 1 && entity.health !== entity.type.health) {
@@ -867,7 +869,7 @@ const GameMode = {
       `,
       `
       You can view/inspect different entities, be it enchantments or creatures,
-      with Q [q/Q]. To apply enchantments, you need to attack the one you want to use.
+      with Q [q/Q]. Note that this does not work in the tutorial. To apply enchantments, you need to attack the one you want to use.
       This promptly kills all adjacent ones, so choose wisely! If you want none of the options, just attack the bomb.
       More will be explained in the next section.
       `,
