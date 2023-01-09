@@ -1,4 +1,19 @@
 import "./style.css";
-import Game from "./src/game";
+import * as Tone from "tone";
+import Canvas from "./Canvas";
 
-let game = new Game();
+let context = new Canvas();
+await context.setup();
+
+let startButton = context.createButton("click to start", (e) => {
+  Tone.start();
+  console.log("tone_started!");
+  context.createSprite("wizard");
+  e.target.remove();
+});
+
+context.addUINode(context.base, startButton);
+
+class GameState {
+  constructor() {}
+}
